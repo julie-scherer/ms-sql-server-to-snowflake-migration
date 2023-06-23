@@ -1,0 +1,1104 @@
+
+
+-- // SELECT DEV_JS.ETL.COPYSELECT('STG','CREO_Log_HIST',3);
+COPY INTO DEV_JS.STG.CREO_Log_HIST FROM (
+    SELECT 
+        METADATA$FILENAME, CURRENT_TIMESTAMP(), to_date('2023-06-01'), 
+        ($1)::bigint, -- $1: LOG_KEY BIGINT NULL 
+		($2)::varchar, -- $2: ACTION VARCHAR(8000) NULL 
+		($3)::varchar, -- $3: DESCRIPTION VARCHAR(8000) NULL 
+		($4)::varchar, -- $4: IP_ADDRESS VARCHAR(8000) NULL 
+		($5)::varchar, -- $5: USERNAME VARCHAR(8000) NULL 
+		($6)::int, -- $6: RULE_KEY INT NULL 
+		($7)::int, -- $7: TEMPLATE_KEY INT NULL 
+		($8)::int, -- $8: PACKAGE_KEY INT NULL 
+		($9)::int, -- $9: CONTAINER_KEY INT NULL 
+		($10)::bigint, -- $10: MESSAGE_KEY BIGINT NULL 
+		($11)::int, -- $11: CAMPAIGN_KEY INT NULL 
+		($12)::int, -- $12: COMMUNICATION_KEY INT NULL 
+		to_timestamp_ntz($13), -- $13: DATE_ENTERED TIMESTAMP_LTZ NULL 
+		($14)::varchar -- $15: SERVER VARCHAR(8000) NOT NULL
+    FROM @ETL.INBOUND
+)
+FILE_FORMAT = (
+    FORMAT_NAME = ARES.STG.LD_CSV_PIPE_SH1_EON_GZ
+)
+PATTERN = 'inbound/CREO/Backfill/Log/Log_Backfill.csv.gz*';
+-- // [STATUS=tbd] : SELECT * FROM STG.CREO_Log_HIST LIMIT 10;
+
+
+
+-- // SELECT DEV_JS.ETL.COPYSELECT('STG','CREO_Message_HIST',3);
+COPY INTO DEV_JS.STG.CREO_Message_HIST FROM (
+    SELECT 
+        METADATA$FILENAME, CURRENT_TIMESTAMP(), to_date('2023-06-01'), 
+        ($1)::bigint, -- $1: MESSAGE_KEY BIGINT NULL 
+		($2)::varchar, -- $2: SUBJECT VARCHAR(8000) NULL 
+		to_timestamp_ntz($3), -- $3: DATE_ENTERED TIMESTAMP_LTZ NULL 
+		to_timestamp_ntz($4), -- $4: DATE_SENT TIMESTAMP_LTZ NULL 
+		($5)::varchar, -- $5: EXCEPTION VARCHAR(8000) NULL 
+		($6)::int, -- $6: CONTAINER_KEY INT NULL 
+		($7)::int, -- $7: COMMUNICATION_MAILING_KEY INT NULL 
+		($8)::int, -- $8: TEMPLATE_KEY INT NULL 
+		($9)::boolean, -- $9: IS_PRODUCTION BOOLEAN NULL 
+		($10)::bigint, -- $10: DATASET_ROW_KEY BIGINT NULL 
+		($11)::varchar, -- $11: SERVER VARCHAR(8000) NULL 
+		($12)::varchar, -- $12: MESSAGE_ID VARCHAR(36) NULL 
+		($13)::smallint, -- $13: TYPE SMALLINT NULL 
+		($14)::int, -- $14: NUM_EXCEPTIONS INT NULL 
+		($15)::int, -- $15: DELIVERY_STATUS_KEY INT NULL 
+		($16)::bigint, -- $16: IN_REPLY_TO_MESSAGE_KEY BIGINT NULL 
+		($17)::smallint, -- $17: DIRECTION SMALLINT NULL 
+		to_timestamp_ntz($18), -- $18: SEND_AFTER TIMESTAMP_LTZ NULL 
+		($19)::bigint, -- $19: SEND_AFTER_MESSAGE_KEY BIGINT NULL 
+		($20)::boolean, -- $20: IS_FINISHED BOOLEAN NULL 
+		($21)::varchar, -- $21: HEADERS VARCHAR(8000) NULL 
+		($22)::varchar -- $23: VENDOR_ID VARCHAR(8000) NOT NULL
+    FROM @ETL.INBOUND
+)
+FILE_FORMAT = (
+    FORMAT_NAME = ARES.STG.LD_CSV_PIPE_SH1_EON_GZ
+)
+PATTERN = 'inbound/CREO/Backfill/Message/Message_Backfill.csv.gz*';
+-- // [STATUS=tbd] : SELECT * FROM STG.CREO_Message_HIST LIMIT 10;
+
+
+
+-- // SELECT DEV_JS.ETL.COPYSELECT('STG','CREO_Package_HIST',3);
+COPY INTO DEV_JS.STG.CREO_Package_HIST FROM (
+    SELECT 
+        METADATA$FILENAME, CURRENT_TIMESTAMP(), to_date('2023-06-01'), 
+        ($1)::int, -- $1: PACKAGE_KEY INT NULL 
+		($2)::int, -- $2: CONTAINER_KEY INT NULL 
+		to_timestamp_ntz($3), -- $3: DATE_PUBLISHED TIMESTAMP_LTZ NULL 
+		to_timestamp_ntz($4), -- $4: DATE_ENTERED TIMESTAMP_LTZ NULL 
+		($5)::varchar, -- $5: HASH VARCHAR(8000) NULL 
+		($6)::varchar, -- $6: COMMIT_MESSAGE VARCHAR(8000) NULL 
+		($7)::varchar -- $8: PUBLISHED_BY VARCHAR(8000) NOT NULL
+    FROM @ETL.INBOUND
+)
+FILE_FORMAT = (
+    FORMAT_NAME = ARES.STG.LD_CSV_PIPE_SH1_EON_GZ
+)
+PATTERN = 'inbound/CREO/Backfill/Package/Package_Backfill.csv.gz*';
+-- // [STATUS=tbd] : SELECT * FROM STG.CREO_Package_HIST LIMIT 10;
+
+
+
+-- // SELECT DEV_JS.ETL.COPYSELECT('STG','CREO_Rule_HIST',3);
+COPY INTO DEV_JS.STG.CREO_Rule_HIST FROM (
+    SELECT 
+        METADATA$FILENAME, CURRENT_TIMESTAMP(), to_date('2023-06-01'), 
+        ($1)::int, -- $1: RULE_KEY INT NULL 
+		($2)::varchar, -- $2: NAME VARCHAR(8000) NULL 
+		($3)::varchar, -- $3: PARAMETER_NAME VARCHAR(8000) NULL 
+		($4)::int, -- $4: TYPE INT NULL 
+		to_timestamp_ntz($5), -- $5: DATE_START TIMESTAMP_LTZ NULL 
+		to_timestamp_ntz($6), -- $6: DATE_END TIMESTAMP_LTZ NULL 
+		($7)::boolean, -- $7: ENABLED BOOLEAN NULL 
+		($8)::boolean, -- $8: IS_DELETED BOOLEAN NULL 
+		to_timestamp_ntz($9), -- $9: DATE_ENTERED TIMESTAMP_LTZ NULL 
+		($10)::varchar, -- $10: DEFINITION VARCHAR(8000) NULL 
+		($11)::int, -- $11: WEIGHT INT NULL 
+		($12)::int -- $13: CONTAINER_KEY INT NOT NULL
+    FROM @ETL.INBOUND
+)
+FILE_FORMAT = (
+    FORMAT_NAME = ARES.STG.LD_CSV_PIPE_SH1_EON_GZ
+)
+PATTERN = 'inbound/CREO/Backfill/Rule/Rule_Backfill.csv.gz*';
+-- // [STATUS=tbd] : SELECT * FROM STG.CREO_Rule_HIST LIMIT 10;
+
+
+
+-- // SELECT DEV_JS.ETL.COPYSELECT('STG','CREO_Config_HIST',3);
+COPY INTO DEV_JS.STG.CREO_Config_HIST FROM (
+    SELECT 
+        METADATA$FILENAME, CURRENT_TIMESTAMP(), to_date('2023-06-01'), 
+        ($1)::int, -- $1: CONFIG_KEY INT NOT NULL 
+		($2)::varchar, -- $2: NAME VARCHAR(8000) NOT NULL 
+		($3)::varchar -- $4: VALUE VARCHAR(8000) NULL
+    FROM @ETL.INBOUND
+)
+FILE_FORMAT = (
+    FORMAT_NAME = ARES.STG.LD_CSV_PIPE_SH1_EON_GZ
+)
+PATTERN = 'inbound/CREO/Backfill/Config/Config_Backfill.csv.gz*';
+-- // [STATUS=tbd] : SELECT * FROM STG.CREO_Config_HIST LIMIT 10;
+
+
+
+-- // SELECT DEV_JS.ETL.COPYSELECT('STG','CREO_Template_HIST',3);
+COPY INTO DEV_JS.STG.CREO_Template_HIST FROM (
+    SELECT 
+        METADATA$FILENAME, CURRENT_TIMESTAMP(), to_date('2023-06-01'), 
+        ($1)::int, -- $1: TEMPLATE_KEY INT NULL 
+		($2)::varchar, -- $2: PATH VARCHAR(8000) NULL 
+		($3)::variant, -- $3: CONTENT VARIANT NULL 
+		($4)::smallint, -- $4: TYPE SMALLINT NULL 
+		to_timestamp_ntz($5), -- $5: DATE_ENTERED TIMESTAMP_LTZ NULL 
+		($6)::varchar, -- $6: DESCRIPTION VARCHAR(8000) NULL 
+		($7)::int, -- $7: BASE_TEMPLATE_KEY INT NULL 
+		($8)::varchar, -- $8: CONTENT_HASH VARCHAR(8000) NULL 
+		($9)::varchar, -- $9: NOTES VARCHAR(8000) NULL 
+		($10)::varchar -- $11: EDITED_BY VARCHAR(8000) NOT NULL
+    FROM @ETL.INBOUND
+)
+FILE_FORMAT = (
+    FORMAT_NAME = ARES.STG.LD_CSV_PIPE_SH1_EON_GZ
+)
+PATTERN = 'inbound/CREO/Backfill/Template/Template_Backfill.csv.gz*';
+-- // [STATUS=tbd] : SELECT * FROM STG.CREO_Template_HIST LIMIT 10;
+
+
+
+-- // SELECT DEV_JS.ETL.COPYSELECT('STG','CREO_Container_HIST',3);
+COPY INTO DEV_JS.STG.CREO_Container_HIST FROM (
+    SELECT 
+        METADATA$FILENAME, CURRENT_TIMESTAMP(), to_date('2023-06-01'), 
+        ($1)::int, -- $1: CONTAINER_KEY INT NOT NULL 
+		($2)::varchar, -- $2: NAME VARCHAR(8000) NOT NULL 
+		to_timestamp_ntz($3), -- $3: DATE_ENTERED TIMESTAMP_LTZ NOT NULL 
+		($4)::boolean, -- $4: IS_DELETED BOOLEAN NOT NULL 
+		($5)::boolean -- $6: IS_DEPRECATED BOOLEAN NULL
+    FROM @ETL.INBOUND
+)
+FILE_FORMAT = (
+    FORMAT_NAME = ARES.STG.LD_CSV_PIPE_SH1_EON_GZ
+)
+PATTERN = 'inbound/CREO/Backfill/Container/Container_Backfill.csv.gz*';
+-- // [STATUS=tbd] : SELECT * FROM STG.CREO_Container_HIST LIMIT 10;
+
+
+
+-- // SELECT DEV_JS.ETL.COPYSELECT('STG','CREO_PackageTemplate_HIST',3);
+COPY INTO DEV_JS.STG.CREO_PackageTemplate_HIST FROM (
+    SELECT 
+        METADATA$FILENAME, CURRENT_TIMESTAMP(), to_date('2023-06-01'), 
+        ($1)::int, -- $1: PACKAGE_KEY INT NOT NULL 
+		($2)::int -- $3: TEMPLATE_KEY INT NULL
+    FROM @ETL.INBOUND
+)
+FILE_FORMAT = (
+    FORMAT_NAME = ARES.STG.LD_CSV_PIPE_SH1_EON_GZ
+)
+PATTERN = 'inbound/CREO/Backfill/PackageTemplate/PackageTemplate_Backfill.csv.gz*';
+-- // [STATUS=tbd] : SELECT * FROM STG.CREO_PackageTemplate_HIST LIMIT 10;
+
+
+
+-- // SELECT DEV_JS.ETL.COPYSELECT('STG','CREO_TemplateRule_HIST',3);
+COPY INTO DEV_JS.STG.CREO_TemplateRule_HIST FROM (
+    SELECT 
+        METADATA$FILENAME, CURRENT_TIMESTAMP(), to_date('2023-06-01'), 
+        ($1)::int, -- $1: TEMPLATE_KEY INT NOT NULL 
+		($2)::int -- $3: RULE_KEY INT NULL
+    FROM @ETL.INBOUND
+)
+FILE_FORMAT = (
+    FORMAT_NAME = ARES.STG.LD_CSV_PIPE_SH1_EON_GZ
+)
+PATTERN = 'inbound/CREO/Backfill/TemplateRule/TemplateRule_Backfill.csv.gz*';
+-- // [STATUS=tbd] : SELECT * FROM STG.CREO_TemplateRule_HIST LIMIT 10;
+
+
+
+-- // SELECT DEV_JS.ETL.COPYSELECT('STG','CREO_Campaign_HIST',3);
+COPY INTO DEV_JS.STG.CREO_Campaign_HIST FROM (
+    SELECT 
+        METADATA$FILENAME, CURRENT_TIMESTAMP(), to_date('2023-06-01'), 
+        ($1)::int, -- $1: CAMPAIGN_KEY INT NULL 
+		($2)::varchar, -- $2: NAME VARCHAR(8000) NULL 
+		($3)::int, -- $3: CONTAINER_KEY INT NULL 
+		($4)::int, -- $4: DATASET_KEY INT NULL 
+		($5)::boolean, -- $5: IS_DELETED BOOLEAN NULL 
+		($6)::boolean, -- $6: IS_ENABLED BOOLEAN NULL 
+		($7)::boolean, -- $7: IS_PRODUCTION BOOLEAN NULL 
+		to_timestamp_ntz($8), -- $8: DATE_ENTERED TIMESTAMP_LTZ NULL 
+		($9)::varchar, -- $9: AUTO_START_PATTERN_FOR_DATASET VARCHAR(8000) NULL 
+		($10)::boolean, -- $10: DISALLOW_RENAME BOOLEAN NULL 
+		($11)::boolean, -- $11: IS_SEED_LIST_ENABLED BOOLEAN NULL 
+		($12)::int, -- $12: SEED_LIST_DATASET_KEY INT NULL 
+		($13)::int, -- $13: SEED_LIST_FREQUENCY_DAYS INT NULL 
+		($14)::time, -- $14: SEED_LIST_START_TIME TIME NULL 
+		to_timestamp_ntz($15), -- $15: SEED_LIST_SENT_AT TIMESTAMP_LTZ NULL 
+		to_timestamp_ntz($16), -- $16: SEED_LIST_WILL_SEND_AT TIMESTAMP_LTZ NULL 
+		($17)::int, -- $17: CAMPAIGN_TYPE_KEY INT NULL 
+		($18)::boolean, -- $18: IS_PRIORITY BOOLEAN NULL 
+		($19)::boolean, -- $19: SEND_WITHOUT_PREFERENCES BOOLEAN NULL 
+		($20)::varchar -- $21: REASON_DISABLED VARCHAR(8000) NOT NULL
+    FROM @ETL.INBOUND
+)
+FILE_FORMAT = (
+    FORMAT_NAME = ARES.STG.LD_CSV_PIPE_SH1_EON_GZ
+)
+PATTERN = 'inbound/CREO/Backfill/Campaign/Campaign_Backfill.csv.gz*';
+-- // [STATUS=tbd] : SELECT * FROM STG.CREO_Campaign_HIST LIMIT 10;
+
+
+
+-- // SELECT DEV_JS.ETL.COPYSELECT('STG','CREO_User_HIST',3);
+COPY INTO DEV_JS.STG.CREO_User_HIST FROM (
+    SELECT 
+        METADATA$FILENAME, CURRENT_TIMESTAMP(), to_date('2023-06-01'), 
+        ($1)::int, -- $1: USER_KEY INT NOT NULL 
+		($2)::varchar, -- $2: USERNAME VARCHAR(8000) NOT NULL 
+		($3)::varchar, -- $3: NAME VARCHAR(8000) NOT NULL 
+		to_timestamp_ntz($4) -- $5: DATE_ENTERED TIMESTAMP_LTZ NULL
+    FROM @ETL.INBOUND
+)
+FILE_FORMAT = (
+    FORMAT_NAME = ARES.STG.LD_CSV_PIPE_SH1_EON_GZ
+)
+PATTERN = 'inbound/CREO/Backfill/User/User_Backfill.csv.gz*';
+-- // [STATUS=tbd] : SELECT * FROM STG.CREO_User_HIST LIMIT 10;
+
+
+
+-- // SELECT DEV_JS.ETL.COPYSELECT('STG','CREO_Communication_HIST',3);
+COPY INTO DEV_JS.STG.CREO_Communication_HIST FROM (
+    SELECT 
+        METADATA$FILENAME, CURRENT_TIMESTAMP(), to_date('2023-06-01'), 
+        ($1)::int, -- $1: COMMUNICATION_KEY INT NULL 
+		($2)::int, -- $2: CAMPAIGN_KEY INT NULL 
+		($3)::boolean, -- $3: IS_ENABLED BOOLEAN NULL 
+		($4)::boolean, -- $4: IS_DELETED BOOLEAN NULL 
+		to_timestamp_ntz($5), -- $5: DATE_ENTERED TIMESTAMP_LTZ NULL 
+		($6)::time, -- $6: START_TIME TIME NULL 
+		($7)::time, -- $7: END_TIME TIME NULL 
+		($8)::int, -- $8: LIMIT_PER_HOUR INT NULL 
+		to_timestamp_ntz($9), -- $9: DATE_START TIMESTAMP_LTZ NULL 
+		to_timestamp_ntz($10), -- $10: DATE_END TIMESTAMP_LTZ NULL 
+		($11)::int, -- $11: WEEKDAYS INT NULL 
+		($12)::varchar, -- $12: TEMPLATE_PATH VARCHAR(8000) NULL 
+		($13)::varchar, -- $13: CONFIG_PATH VARCHAR(8000) NULL 
+		($14)::smallint, -- $14: TYPE SMALLINT NULL 
+		($15)::boolean, -- $15: ENABLE_QUEUE_BEFORE_DATE_START BOOLEAN NULL 
+		($16)::boolean, -- $16: IS_PRODUCTION BOOLEAN NULL 
+		($17)::varchar, -- $17: Provider VARCHAR(8000) NULL 
+		($18)::varchar -- $19: REASON_DISABLED VARCHAR(8000) NOT NULL
+    FROM @ETL.INBOUND
+)
+FILE_FORMAT = (
+    FORMAT_NAME = ARES.STG.LD_CSV_PIPE_SH1_EON_GZ
+)
+PATTERN = 'inbound/CREO/Backfill/Communication/Communication_Backfill.csv.gz*';
+-- // [STATUS=tbd] : SELECT * FROM STG.CREO_Communication_HIST LIMIT 10;
+
+
+
+-- // SELECT DEV_JS.ETL.COPYSELECT('STG','CREO_CommunicationMailing_HIST',3);
+COPY INTO DEV_JS.STG.CREO_CommunicationMailing_HIST FROM (
+    SELECT 
+        METADATA$FILENAME, CURRENT_TIMESTAMP(), to_date('2023-06-01'), 
+        ($1)::int, -- $1: COMMUNICATION_MAILING_KEY INT NULL 
+		($2)::int, -- $2: COMMUNICATION_KEY INT NULL 
+		($3)::int, -- $3: SENT INT NULL 
+		($4)::int, -- $4: QUEUED INT NULL 
+		($5)::int, -- $5: TOTAL INT NULL 
+		($6)::int, -- $6: EXCEPTION INT NULL 
+		($7)::int, -- $7: STATUS INT NULL 
+		($8)::boolean, -- $8: IS_STALE BOOLEAN NULL 
+		to_timestamp_ntz($9), -- $9: DATE_STARTED TIMESTAMP_LTZ NULL 
+		to_timestamp_ntz($10), -- $10: DATE_COMPLETED TIMESTAMP_LTZ NULL 
+		to_timestamp_ntz($11) -- $12: DATE_UPDATED TIMESTAMP_LTZ NOT NULL
+    FROM @ETL.INBOUND
+)
+FILE_FORMAT = (
+    FORMAT_NAME = ARES.STG.LD_CSV_PIPE_SH1_EON_GZ
+)
+PATTERN = 'inbound/CREO/Backfill/CommunicationMailing/CommunicationMailing_Backfill.csv.gz*';
+-- // [STATUS=tbd] : SELECT * FROM STG.CREO_CommunicationMailing_HIST LIMIT 10;
+
+
+
+-- // SELECT DEV_JS.ETL.COPYSELECT('STG','CREO_Dataset_HIST',3);
+COPY INTO DEV_JS.STG.CREO_Dataset_HIST FROM (
+    SELECT 
+        METADATA$FILENAME, CURRENT_TIMESTAMP(), to_date('2023-06-01'), 
+        ($1)::int, -- $1: DATASET_KEY INT NULL 
+		($2)::varchar, -- $2: NAME VARCHAR(8000) NULL 
+		to_timestamp_ntz($3), -- $3: DATE_ENTERED TIMESTAMP_LTZ NULL 
+		($4)::boolean, -- $4: IS_DELETED BOOLEAN NULL 
+		($5)::int, -- $5: CONTAINER_KEY INT NULL 
+		($6)::int, -- $6: ATTRIBUTES INT NULL 
+		($7)::int, -- $7: ROW_COUNT INT NULL 
+		to_timestamp_ntz($8) -- $9: ROW_COUNT_UPDATED TIMESTAMP_LTZ NOT NULL
+    FROM @ETL.INBOUND
+)
+FILE_FORMAT = (
+    FORMAT_NAME = ARES.STG.LD_CSV_PIPE_SH1_EON_GZ
+)
+PATTERN = 'inbound/CREO/Backfill/Dataset/Dataset_Backfill.csv.gz*';
+-- // [STATUS=tbd] : SELECT * FROM STG.CREO_Dataset_HIST LIMIT 10;
+
+
+
+-- // SELECT DEV_JS.ETL.COPYSELECT('STG','CREO_DatasetCell_HIST',3);
+COPY INTO DEV_JS.STG.CREO_DatasetCell_HIST FROM (
+    SELECT 
+        METADATA$FILENAME, CURRENT_TIMESTAMP(), to_date('2023-06-01'), 
+        ($1)::bigint, -- $1: DATASET_ROW_KEY BIGINT NOT NULL 
+		($2)::int, -- $2: DATASET_COLUMN_KEY INT NOT NULL 
+		($3)::bigint -- $4: DATASET_VALUE_KEY BIGINT NULL
+    FROM @ETL.INBOUND
+)
+FILE_FORMAT = (
+    FORMAT_NAME = ARES.STG.LD_CSV_PIPE_SH1_EON_GZ
+)
+PATTERN = 'inbound/CREO/Backfill/DatasetCell/DatasetCell_Backfill.csv.gz*';
+-- // [STATUS=tbd] : SELECT * FROM STG.CREO_DatasetCell_HIST LIMIT 10;
+
+
+
+-- // SELECT DEV_JS.ETL.COPYSELECT('STG','CREO_DatasetColumn_HIST',3);
+COPY INTO DEV_JS.STG.CREO_DatasetColumn_HIST FROM (
+    SELECT 
+        METADATA$FILENAME, CURRENT_TIMESTAMP(), to_date('2023-06-01'), 
+        ($1)::int, -- $1: DATASET_COLUMN_KEY INT NOT NULL 
+		($2)::varchar -- $3: NAME VARCHAR(8000) NULL
+    FROM @ETL.INBOUND
+)
+FILE_FORMAT = (
+    FORMAT_NAME = ARES.STG.LD_CSV_PIPE_SH1_EON_GZ
+)
+PATTERN = 'inbound/CREO/Backfill/DatasetColumn/DatasetColumn_Backfill.csv.gz*';
+-- // [STATUS=tbd] : SELECT * FROM STG.CREO_DatasetColumn_HIST LIMIT 10;
+
+
+
+-- // SELECT DEV_JS.ETL.COPYSELECT('STG','CREO_DatasetRow_HIST',3);
+COPY INTO DEV_JS.STG.CREO_DatasetRow_HIST FROM (
+    SELECT 
+        METADATA$FILENAME, CURRENT_TIMESTAMP(), to_date('2023-06-01'), 
+        ($1)::bigint, -- $1: DATASET_ROW_KEY BIGINT NOT NULL 
+		($2)::int, -- $2: DATASET_KEY INT NOT NULL 
+		($3)::boolean -- $4: HAS_MESSAGE BOOLEAN NULL
+    FROM @ETL.INBOUND
+)
+FILE_FORMAT = (
+    FORMAT_NAME = ARES.STG.LD_CSV_PIPE_SH1_EON_GZ
+)
+PATTERN = 'inbound/CREO/Backfill/DatasetRow/DatasetRow_Backfill.csv.gz*';
+-- // [STATUS=tbd] : SELECT * FROM STG.CREO_DatasetRow_HIST LIMIT 10;
+
+
+
+-- // SELECT DEV_JS.ETL.COPYSELECT('STG','CREO_DatasetValue_HIST',3);
+COPY INTO DEV_JS.STG.CREO_DatasetValue_HIST FROM (
+    SELECT 
+        METADATA$FILENAME, CURRENT_TIMESTAMP(), to_date('2023-06-01'), 
+        ($1)::bigint, -- $1: DATASET_VALUE_KEY BIGINT NULL 
+		($2)::varchar, -- $2: VALUE VARCHAR(8000) NULL 
+		($3)::binary -- $4: VALUE_HASH BINARY(8000) NOT NULL
+    FROM @ETL.INBOUND
+)
+FILE_FORMAT = (
+    FORMAT_NAME = ARES.STG.LD_CSV_PIPE_SH1_EON_GZ
+)
+PATTERN = 'inbound/CREO/Backfill/DatasetValue/DatasetValue_Backfill.csv.gz*';
+-- // [STATUS=tbd] : SELECT * FROM STG.CREO_DatasetValue_HIST LIMIT 10;
+
+
+
+-- // SELECT DEV_JS.ETL.COPYSELECT('STG','CREO_Datasource_HIST',3);
+COPY INTO DEV_JS.STG.CREO_Datasource_HIST FROM (
+    SELECT 
+        METADATA$FILENAME, CURRENT_TIMESTAMP(), to_date('2023-06-01'), 
+        ($1)::int, -- $1: DATASOURCE_KEY INT NOT NULL 
+		($2)::varchar, -- $2: NAME VARCHAR(8000) NOT NULL 
+		($3)::varchar, -- $3: DEFINITION VARCHAR(8000) NOT NULL 
+		($4)::int -- $5: TYPE INT NULL
+    FROM @ETL.INBOUND
+)
+FILE_FORMAT = (
+    FORMAT_NAME = ARES.STG.LD_CSV_PIPE_SH1_EON_GZ
+)
+PATTERN = 'inbound/CREO/Backfill/Datasource/Datasource_Backfill.csv.gz*';
+-- // [STATUS=tbd] : SELECT * FROM STG.CREO_Datasource_HIST LIMIT 10;
+
+
+
+-- // SELECT DEV_JS.ETL.COPYSELECT('STG','CREO_DeliveryStatus_HIST',3);
+COPY INTO DEV_JS.STG.CREO_DeliveryStatus_HIST FROM (
+    SELECT 
+        METADATA$FILENAME, CURRENT_TIMESTAMP(), to_date('2023-06-01'), 
+        ($1)::int, -- $1: DELIVERY_STATUS_KEY INT NULL 
+		($2)::varchar, -- $2: NAME VARCHAR(8000) NULL 
+		($3)::varchar, -- $3: REFERENCE VARCHAR(8000) NULL 
+		($4)::int, -- $4: LIMIT_PER_MESSAGE INT NULL 
+		($5)::boolean, -- $5: IS_ERROR BOOLEAN NULL 
+		($6)::boolean, -- $6: IS_FINAL BOOLEAN NULL 
+		($7)::varchar -- $8: DESCRIPTION VARCHAR(8000) NOT NULL
+    FROM @ETL.INBOUND
+)
+FILE_FORMAT = (
+    FORMAT_NAME = ARES.STG.LD_CSV_PIPE_SH1_EON_GZ
+)
+PATTERN = 'inbound/CREO/Backfill/DeliveryStatus/DeliveryStatus_Backfill.csv.gz*';
+-- // [STATUS=tbd] : SELECT * FROM STG.CREO_DeliveryStatus_HIST LIMIT 10;
+
+
+
+-- // SELECT DEV_JS.ETL.COPYSELECT('STG','CREO_Emoji_HIST',3);
+COPY INTO DEV_JS.STG.CREO_Emoji_HIST FROM (
+    SELECT 
+        METADATA$FILENAME, CURRENT_TIMESTAMP(), to_date('2023-06-01'), 
+        ($1)::int, -- $1: EMOJI_KEY INT NULL 
+		($2)::varchar, -- $2: SHORT_NAME VARCHAR(8000) NULL 
+		($3)::varchar, -- $3: DESCRIPTION VARCHAR(8000) NULL 
+		($4)::varchar -- $5: CODE VARCHAR(8000) NOT NULL
+    FROM @ETL.INBOUND
+)
+FILE_FORMAT = (
+    FORMAT_NAME = ARES.STG.LD_CSV_PIPE_SH1_EON_GZ
+)
+PATTERN = 'inbound/CREO/Backfill/Emoji/Emoji_Backfill.csv.gz*';
+-- // [STATUS=tbd] : SELECT * FROM STG.CREO_Emoji_HIST LIMIT 10;
+
+
+
+-- // SELECT DEV_JS.ETL.COPYSELECT('STG','CREO_Folder_HIST',3);
+COPY INTO DEV_JS.STG.CREO_Folder_HIST FROM (
+    SELECT 
+        METADATA$FILENAME, CURRENT_TIMESTAMP(), to_date('2023-06-01'), 
+        ($1)::int, -- $1: FOLDER_KEY INT NULL 
+		($2)::varchar, -- $2: NAME VARCHAR(8000) NULL 
+		($3)::int, -- $3: CONTAINER_KEY INT NULL 
+		($4)::int, -- $4: PARENT_FOLDER_KEY INT NULL 
+		($5)::boolean, -- $5: IS_CATCH_ALL BOOLEAN NULL 
+		($6)::int -- $7: DELETE_AFTER_DAYS INT NOT NULL
+    FROM @ETL.INBOUND
+)
+FILE_FORMAT = (
+    FORMAT_NAME = ARES.STG.LD_CSV_PIPE_SH1_EON_GZ
+)
+PATTERN = 'inbound/CREO/Backfill/Folder/Folder_Backfill.csv.gz*';
+-- // [STATUS=tbd] : SELECT * FROM STG.CREO_Folder_HIST LIMIT 10;
+
+
+
+-- // SELECT DEV_JS.ETL.COPYSELECT('STG','CREO_MessageDeliveryStatus_HIST',3);
+COPY INTO DEV_JS.STG.CREO_MessageDeliveryStatus_HIST FROM (
+    SELECT 
+        METADATA$FILENAME, CURRENT_TIMESTAMP(), to_date('2023-06-01'), 
+        ($1)::bigint, -- $1: MESSAGE_DELIVERY_STATUS_KEY BIGINT NULL 
+		($2)::bigint, -- $2: MESSAGE_KEY BIGINT NULL 
+		($3)::int, -- $3: DELIVERY_STATUS_KEY INT NULL 
+		to_timestamp_ntz($4), -- $4: DATE_ENTERED TIMESTAMP_LTZ NULL 
+		($5)::varchar -- $6: DETAIL VARCHAR(8000) NOT NULL
+    FROM @ETL.INBOUND
+)
+FILE_FORMAT = (
+    FORMAT_NAME = ARES.STG.LD_CSV_PIPE_SH1_EON_GZ
+)
+PATTERN = 'inbound/CREO/Backfill/MessageDeliveryStatus/MessageDeliveryStatus_Backfill.csv.gz*';
+-- // [STATUS=tbd] : SELECT * FROM STG.CREO_MessageDeliveryStatus_HIST LIMIT 10;
+
+
+
+-- // SELECT DEV_JS.ETL.COPYSELECT('STG','CREO_FolderContact_HIST',3);
+COPY INTO DEV_JS.STG.CREO_FolderContact_HIST FROM (
+    SELECT 
+        METADATA$FILENAME, CURRENT_TIMESTAMP(), to_date('2023-06-01'), 
+        ($1)::int, -- $1: CONTACT_KEY INT NOT NULL 
+		($2)::int -- $3: FOLDER_KEY INT NULL
+    FROM @ETL.INBOUND
+)
+FILE_FORMAT = (
+    FORMAT_NAME = ARES.STG.LD_CSV_PIPE_SH1_EON_GZ
+)
+PATTERN = 'inbound/CREO/Backfill/FolderContact/FolderContact_Backfill.csv.gz*';
+-- // [STATUS=tbd] : SELECT * FROM STG.CREO_FolderContact_HIST LIMIT 10;
+
+
+
+-- // SELECT DEV_JS.ETL.COPYSELECT('STG','CREO_FolderMessage_HIST',3);
+COPY INTO DEV_JS.STG.CREO_FolderMessage_HIST FROM (
+    SELECT 
+        METADATA$FILENAME, CURRENT_TIMESTAMP(), to_date('2023-06-01'), 
+        ($1)::bigint, -- $1: MESSAGE_KEY BIGINT NOT NULL 
+		($2)::int, -- $2: FOLDER_KEY INT NOT NULL 
+		($3)::varchar, -- $3: LOCKED_BY VARCHAR(8000) NOT NULL 
+		($4)::boolean -- $5: IS_READ BOOLEAN NULL
+    FROM @ETL.INBOUND
+)
+FILE_FORMAT = (
+    FORMAT_NAME = ARES.STG.LD_CSV_PIPE_SH1_EON_GZ
+)
+PATTERN = 'inbound/CREO/Backfill/FolderMessage/FolderMessage_Backfill.csv.gz*';
+-- // [STATUS=tbd] : SELECT * FROM STG.CREO_FolderMessage_HIST LIMIT 10;
+
+
+
+-- // SELECT DEV_JS.ETL.COPYSELECT('STG','CREO_Parameter_HIST',3);
+COPY INTO DEV_JS.STG.CREO_Parameter_HIST FROM (
+    SELECT 
+        METADATA$FILENAME, CURRENT_TIMESTAMP(), to_date('2023-06-01'), 
+        ($1)::int, -- $1: PARAMETER_KEY INT NULL 
+		($2)::varchar, -- $2: NAME VARCHAR(8000) NULL 
+		($3)::varchar, -- $3: DEFINITION VARCHAR(8000) NULL 
+		($4)::int -- $5: DATASOURCE_KEY INT NOT NULL
+    FROM @ETL.INBOUND
+)
+FILE_FORMAT = (
+    FORMAT_NAME = ARES.STG.LD_CSV_PIPE_SH1_EON_GZ
+)
+PATTERN = 'inbound/CREO/Backfill/Parameter/Parameter_Backfill.csv.gz*';
+-- // [STATUS=tbd] : SELECT * FROM STG.CREO_Parameter_HIST LIMIT 10;
+
+
+
+-- // SELECT DEV_JS.ETL.COPYSELECT('STG','CREO_MessageStatusQueue_HIST',3);
+COPY INTO DEV_JS.STG.CREO_MessageStatusQueue_HIST FROM (
+    SELECT 
+        METADATA$FILENAME, CURRENT_TIMESTAMP(), to_date('2023-06-01'), 
+        ($1)::bigint, -- $1: MESSAGE_STATUS_QUEUE_KEY BIGINT NULL 
+		($2)::varchar, -- $2: DATA VARCHAR(8000) NULL 
+		($3)::varchar, -- $3: DETAIL VARCHAR(8000) NULL 
+		($4)::int, -- $4: TYPE INT NULL 
+		($5)::datetime, -- $5: ENTERED_AT datetime NULL 
+		($6)::int, -- $6: CONTAINER_KEY INT NULL 
+		($7)::varchar -- $8: SERVER VARCHAR(8000) NOT NULL
+    FROM @ETL.INBOUND
+)
+FILE_FORMAT = (
+    FORMAT_NAME = ARES.STG.LD_CSV_PIPE_SH1_EON_GZ
+)
+PATTERN = 'inbound/CREO/Backfill/MessageStatusQueue/MessageStatusQueue_Backfill.csv.gz*';
+-- // [STATUS=tbd] : SELECT * FROM STG.CREO_MessageStatusQueue_HIST LIMIT 10;
+
+
+
+-- // SELECT DEV_JS.ETL.COPYSELECT('STG','CREO_Global_HIST',3);
+COPY INTO DEV_JS.STG.CREO_Global_HIST FROM (
+    SELECT 
+        METADATA$FILENAME, CURRENT_TIMESTAMP(), to_date('2023-06-01'), 
+        ($1)::decimal, -- $2: APP_VERSION DECIMAL(38,38) NULL
+    FROM @ETL.INBOUND
+)
+FILE_FORMAT = (
+    FORMAT_NAME = ARES.STG.LD_CSV_PIPE_SH1_EON_GZ
+)
+PATTERN = 'inbound/CREO/Backfill/Global/Global_Backfill.csv.gz*';
+-- // [STATUS=tbd] : SELECT * FROM STG.CREO_Global_HIST LIMIT 10;
+
+
+
+-- // SELECT DEV_JS.ETL.COPYSELECT('STG','CREO_CampaignType_HIST',3);
+COPY INTO DEV_JS.STG.CREO_CampaignType_HIST FROM (
+    SELECT 
+        METADATA$FILENAME, CURRENT_TIMESTAMP(), to_date('2023-06-01'), 
+        ($1)::int, -- $1: CAMPAIGN_TYPE_KEY INT NOT NULL 
+		($2)::varchar -- $3: NAME VARCHAR(8000) NULL
+    FROM @ETL.INBOUND
+)
+FILE_FORMAT = (
+    FORMAT_NAME = ARES.STG.LD_CSV_PIPE_SH1_EON_GZ
+)
+PATTERN = 'inbound/CREO/Backfill/CampaignType/CampaignType_Backfill.csv.gz*';
+-- // [STATUS=tbd] : SELECT * FROM STG.CREO_CampaignType_HIST LIMIT 10;
+
+
+
+-- // SELECT DEV_JS.ETL.COPYSELECT('STG','CREO_TempMessage_HIST',3);
+COPY INTO DEV_JS.STG.CREO_TempMessage_HIST FROM (
+    SELECT 
+        METADATA$FILENAME, CURRENT_TIMESTAMP(), to_date('2023-06-01'), 
+        ($1)::int, -- $1: TEMP_MESSAGE_KEY INT NULL 
+		($2)::varchar -- $3: Json VARCHAR(8000) NOT NULL
+    FROM @ETL.INBOUND
+)
+FILE_FORMAT = (
+    FORMAT_NAME = ARES.STG.LD_CSV_PIPE_SH1_EON_GZ
+)
+PATTERN = 'inbound/CREO/Backfill/TempMessage/TempMessage_Backfill.csv.gz*';
+-- // [STATUS=tbd] : SELECT * FROM STG.CREO_TempMessage_HIST LIMIT 10;
+
+
+
+-- // SELECT DEV_JS.ETL.COPYSELECT('STG','CREO_ContactType_HIST',3);
+COPY INTO DEV_JS.STG.CREO_ContactType_HIST FROM (
+    SELECT 
+        METADATA$FILENAME, CURRENT_TIMESTAMP(), to_date('2023-06-01'), 
+        ($1)::smallint, -- $1: CONTACT_TYPE_KEY SMALLINT NOT NULL 
+		($2)::varchar -- $3: DESCRIPTION VARCHAR(8000) NULL
+    FROM @ETL.INBOUND
+)
+FILE_FORMAT = (
+    FORMAT_NAME = ARES.STG.LD_CSV_PIPE_SH1_EON_GZ
+)
+PATTERN = 'inbound/CREO/Backfill/ContactType/ContactType_Backfill.csv.gz*';
+-- // [STATUS=tbd] : SELECT * FROM STG.CREO_ContactType_HIST LIMIT 10;
+
+
+
+-- // SELECT DEV_JS.ETL.COPYSELECT('STG','CREO_ApprovalRequest_HIST',3);
+COPY INTO DEV_JS.STG.CREO_ApprovalRequest_HIST FROM (
+    SELECT 
+        METADATA$FILENAME, CURRENT_TIMESTAMP(), to_date('2023-06-01'), 
+        ($1)::int, -- $1: APPROVAL_REQUEST_KEY INT NULL 
+		($2)::int, -- $2: STATUS INT NULL 
+		to_timestamp_ntz($3), -- $3: ENTERED_AT TIMESTAMP_LTZ NULL 
+		($4)::int, -- $4: PACKAGE_KEY INT NULL 
+		($5)::varchar, -- $5: REQUESTED_BY VARCHAR(8000) NULL 
+		($6)::varchar, -- $6: PROCESSED_BY VARCHAR(8000) NULL 
+		($7)::varchar, -- $7: COMMIT_MESSAGE VARCHAR(8000) NULL 
+		to_timestamp_ntz($8) -- $9: PROCESSED_AT TIMESTAMP_LTZ NOT NULL
+    FROM @ETL.INBOUND
+)
+FILE_FORMAT = (
+    FORMAT_NAME = ARES.STG.LD_CSV_PIPE_SH1_EON_GZ
+)
+PATTERN = 'inbound/CREO/Backfill/ApprovalRequest/ApprovalRequest_Backfill.csv.gz*';
+-- // [STATUS=tbd] : SELECT * FROM STG.CREO_ApprovalRequest_HIST LIMIT 10;
+
+
+
+-- // SELECT DEV_JS.ETL.COPYSELECT('STG','CREO_DeadMessages_HIST',3);
+COPY INTO DEV_JS.STG.CREO_DeadMessages_HIST FROM (
+    SELECT 
+        METADATA$FILENAME, CURRENT_TIMESTAMP(), to_date('2023-06-01'), 
+        ($1)::bigint, -- $1: MESSAGE_KEY BIGINT NOT NULL 
+		($2)::varchar, -- $2: SUBJECT VARCHAR(8000) NOT NULL 
+		to_timestamp_ntz($3), -- $3: DATE_ENTERED TIMESTAMP_LTZ NOT NULL 
+		to_timestamp_ntz($4), -- $4: DATE_SENT TIMESTAMP_LTZ NOT NULL 
+		($5)::varchar, -- $5: EXCEPTION VARCHAR(8000) NOT NULL 
+		($6)::int, -- $6: CONTAINER_KEY INT NOT NULL 
+		($7)::int, -- $7: COMMUNICATION_MAILING_KEY INT NOT NULL 
+		($8)::int, -- $8: TEMPLATE_KEY INT NOT NULL 
+		($9)::boolean, -- $9: IS_PRODUCTION BOOLEAN NOT NULL 
+		($10)::bigint, -- $10: DATASET_ROW_KEY BIGINT NOT NULL 
+		($11)::varchar, -- $11: SERVER VARCHAR(8000) NOT NULL 
+		($12)::varchar, -- $12: MESSAGE_ID VARCHAR(36) NOT NULL 
+		($13)::smallint, -- $13: TYPE SMALLINT NOT NULL 
+		($14)::int, -- $14: NUM_EXCEPTIONS INT NOT NULL 
+		($15)::int, -- $15: DELIVERY_STATUS_KEY INT NOT NULL 
+		($16)::bigint, -- $16: IN_REPLY_TO_MESSAGE_KEY BIGINT NOT NULL 
+		($17)::smallint, -- $17: DIRECTION SMALLINT NOT NULL 
+		to_timestamp_ntz($18), -- $18: SEND_AFTER TIMESTAMP_LTZ NOT NULL 
+		($19)::bigint, -- $19: SEND_AFTER_MESSAGE_KEY BIGINT NOT NULL 
+		($20)::boolean -- $21: IS_FINISHED BOOLEAN NULL
+    FROM @ETL.INBOUND
+)
+FILE_FORMAT = (
+    FORMAT_NAME = ARES.STG.LD_CSV_PIPE_SH1_EON_GZ
+)
+PATTERN = 'inbound/CREO/Backfill/DeadMessages/DeadMessages_Backfill.csv.gz*';
+-- // [STATUS=tbd] : SELECT * FROM STG.CREO_DeadMessages_HIST LIMIT 10;
+
+
+
+-- // SELECT DEV_JS.ETL.COPYSELECT('STG','CREO_MessageContactType_HIST',3);
+COPY INTO DEV_JS.STG.CREO_MessageContactType_HIST FROM (
+    SELECT 
+        METADATA$FILENAME, CURRENT_TIMESTAMP(), to_date('2023-06-01'), 
+        ($1)::int, -- $1: MESSAGE_CONTACT_TYPE_KEY INT NOT NULL 
+		($2)::varchar -- $3: DESCRIPTION VARCHAR(8000) NULL
+    FROM @ETL.INBOUND
+)
+FILE_FORMAT = (
+    FORMAT_NAME = ARES.STG.LD_CSV_PIPE_SH1_EON_GZ
+)
+PATTERN = 'inbound/CREO/Backfill/MessageContactType/MessageContactType_Backfill.csv.gz*';
+-- // [STATUS=tbd] : SELECT * FROM STG.CREO_MessageContactType_HIST LIMIT 10;
+
+
+
+-- // SELECT DEV_JS.ETL.COPYSELECT('STG','CREO_ApprovalRequestItem_HIST',3);
+COPY INTO DEV_JS.STG.CREO_ApprovalRequestItem_HIST FROM (
+    SELECT 
+        METADATA$FILENAME, CURRENT_TIMESTAMP(), to_date('2023-06-01'), 
+        ($1)::int, -- $1: APPROVAL_REQUEST_ITEM_KEY INT NOT NULL 
+		($2)::int, -- $2: APPROVAL_REQUEST_KEY INT NOT NULL 
+		($3)::int -- $4: TEMPLATE_KEY INT NULL
+    FROM @ETL.INBOUND
+)
+FILE_FORMAT = (
+    FORMAT_NAME = ARES.STG.LD_CSV_PIPE_SH1_EON_GZ
+)
+PATTERN = 'inbound/CREO/Backfill/ApprovalRequestItem/ApprovalRequestItem_Backfill.csv.gz*';
+-- // [STATUS=tbd] : SELECT * FROM STG.CREO_ApprovalRequestItem_HIST LIMIT 10;
+
+
+
+-- // SELECT DEV_JS.ETL.COPYSELECT('STG','CREO_MessageType_HIST',3);
+COPY INTO DEV_JS.STG.CREO_MessageType_HIST FROM (
+    SELECT 
+        METADATA$FILENAME, CURRENT_TIMESTAMP(), to_date('2023-06-01'), 
+        ($1)::smallint, -- $1: MESSAGE_TYPE_KEY SMALLINT NOT NULL 
+		($2)::varchar -- $3: DESCRIPTION VARCHAR(8000) NULL
+    FROM @ETL.INBOUND
+)
+FILE_FORMAT = (
+    FORMAT_NAME = ARES.STG.LD_CSV_PIPE_SH1_EON_GZ
+)
+PATTERN = 'inbound/CREO/Backfill/MessageType/MessageType_Backfill.csv.gz*';
+-- // [STATUS=tbd] : SELECT * FROM STG.CREO_MessageType_HIST LIMIT 10;
+
+
+
+-- // SELECT DEV_JS.ETL.COPYSELECT('STG','CREO_ConfigHistory_HIST',3);
+COPY INTO DEV_JS.STG.CREO_ConfigHistory_HIST FROM (
+    SELECT 
+        METADATA$FILENAME, CURRENT_TIMESTAMP(), to_date('2023-06-01'), 
+        ($1)::int, -- $1: CONFIG_HISTORY_KEY INT NOT NULL 
+		($2)::int, -- $2: CONFIG_KEY INT NOT NULL 
+		($3)::varchar, -- $3: NAME VARCHAR(8000) NOT NULL 
+		($4)::varchar, -- $4: OLD_VALUE VARCHAR(8000) NOT NULL 
+		($5)::varchar, -- $5: CHANGED_BY VARCHAR(8000) NOT NULL 
+		to_timestamp_ntz($6) -- $7: DATE_ENTERED TIMESTAMP_LTZ NULL
+    FROM @ETL.INBOUND
+)
+FILE_FORMAT = (
+    FORMAT_NAME = ARES.STG.LD_CSV_PIPE_SH1_EON_GZ
+)
+PATTERN = 'inbound/CREO/Backfill/ConfigHistory/ConfigHistory_Backfill.csv.gz*';
+-- // [STATUS=tbd] : SELECT * FROM STG.CREO_ConfigHistory_HIST LIMIT 10;
+
+
+
+-- // SELECT DEV_JS.ETL.COPYSELECT('STG','CREO_TemplateType_HIST',3);
+COPY INTO DEV_JS.STG.CREO_TemplateType_HIST FROM (
+    SELECT 
+        METADATA$FILENAME, CURRENT_TIMESTAMP(), to_date('2023-06-01'), 
+        ($1)::smallint, -- $1: TEMPLATE_TYPE_KEY SMALLINT NOT NULL 
+		($2)::varchar -- $3: DESCRIPTION VARCHAR(8000) NULL
+    FROM @ETL.INBOUND
+)
+FILE_FORMAT = (
+    FORMAT_NAME = ARES.STG.LD_CSV_PIPE_SH1_EON_GZ
+)
+PATTERN = 'inbound/CREO/Backfill/TemplateType/TemplateType_Backfill.csv.gz*';
+-- // [STATUS=tbd] : SELECT * FROM STG.CREO_TemplateType_HIST LIMIT 10;
+
+
+
+-- // SELECT DEV_JS.ETL.COPYSELECT('STG','CREO_Contact_HIST',3);
+COPY INTO DEV_JS.STG.CREO_Contact_HIST FROM (
+    SELECT 
+        METADATA$FILENAME, CURRENT_TIMESTAMP(), to_date('2023-06-01'), 
+        ($1)::int, -- $1: CONTACT_KEY INT NOT NULL 
+		($2)::varchar, -- $2: NAME VARCHAR(8000) NOT NULL 
+		($3)::varchar, -- $3: ADDRESS VARCHAR(8000) NOT NULL 
+		to_timestamp_ntz($4), -- $4: DATE_ENTERED TIMESTAMP_LTZ NOT NULL 
+		($5)::smallint, -- $5: CONTACT_TYPE SMALLINT NOT NULL 
+		($6)::boolean, -- $6: IS_EXPIRED BOOLEAN NOT NULL 
+		($7)::int, -- $7: NUM_ERRORS INT NOT NULL 
+		($8)::boolean -- $9: IS_INVALID BOOLEAN NULL
+    FROM @ETL.INBOUND
+)
+FILE_FORMAT = (
+    FORMAT_NAME = ARES.STG.LD_CSV_PIPE_SH1_EON_GZ
+)
+PATTERN = 'inbound/CREO/Backfill/Contact/Contact_Backfill.csv.gz*';
+-- // [STATUS=tbd] : SELECT * FROM STG.CREO_Contact_HIST LIMIT 10;
+
+
+
+-- // SELECT DEV_JS.ETL.COPYSELECT('STG','CREO_MessageContact_HIST',3);
+COPY INTO DEV_JS.STG.CREO_MessageContact_HIST FROM (
+    SELECT 
+        METADATA$FILENAME, CURRENT_TIMESTAMP(), to_date('2023-06-01'), 
+        ($1)::int, -- $1: MESSAGE_CONTACT_KEY INT NOT NULL 
+		($2)::bigint, -- $2: MESSAGE_KEY BIGINT NOT NULL 
+		($3)::int, -- $3: CONTACT_KEY INT NOT NULL 
+		($4)::int -- $5: TYPE INT NULL
+    FROM @ETL.INBOUND
+)
+FILE_FORMAT = (
+    FORMAT_NAME = ARES.STG.LD_CSV_PIPE_SH1_EON_GZ
+)
+PATTERN = 'inbound/CREO/Backfill/MessageContact/MessageContact_Backfill.csv.gz*';
+-- // [STATUS=tbd] : SELECT * FROM STG.CREO_MessageContact_HIST LIMIT 10;
+
+
+
+-- // SELECT DEV_JS.ETL.COPYSELECT('STG','CREO_MessagePart_HIST',3);
+COPY INTO DEV_JS.STG.CREO_MessagePart_HIST FROM (
+    SELECT 
+        METADATA$FILENAME, CURRENT_TIMESTAMP(), to_date('2023-06-01'), 
+        ($1)::int, -- $1: MESSAGE_PART_KEY INT NOT NULL 
+		($2)::bigint, -- $2: MESSAGE_KEY BIGINT NOT NULL 
+		($3)::varchar, -- $3: CONTENT_TYPE VARCHAR(8000) NOT NULL 
+		($4)::varchar, -- $4: FILENAME VARCHAR(8000) NOT NULL 
+		($5)::variant, -- $5: DATA VARIANT NOT NULL 
+		($6)::boolean -- $7: IS_COMPRESSED BOOLEAN NULL
+    FROM @ETL.INBOUND
+)
+FILE_FORMAT = (
+    FORMAT_NAME = ARES.STG.LD_CSV_PIPE_SH1_EON_GZ
+)
+PATTERN = 'inbound/CREO/Backfill/MessagePart/MessagePart_Backfill.csv.gz*';
+-- // [STATUS=tbd] : SELECT * FROM STG.CREO_MessagePart_HIST LIMIT 10;
+
+
+
+-- // SELECT DEV_JS.ETL.COPYSELECT('STG','CREO_MessageContactV2_HIST',3);
+COPY INTO DEV_JS.STG.CREO_MessageContactV2_HIST FROM (
+    SELECT 
+        METADATA$FILENAME, CURRENT_TIMESTAMP(), to_date('2023-06-01'), 
+        ($1)::bigint, -- $1: MESSAGE_CONTACT_KEY BIGINT NOT NULL 
+		($2)::bigint, -- $2: MESSAGE_KEY BIGINT NOT NULL 
+		($3)::int, -- $3: CONTACT_KEY INT NOT NULL 
+		($4)::int -- $5: TYPE INT NULL
+    FROM @ETL.INBOUND
+)
+FILE_FORMAT = (
+    FORMAT_NAME = ARES.STG.LD_CSV_PIPE_SH1_EON_GZ
+)
+PATTERN = 'inbound/CREO/Backfill/MessageContactV2/MessageContactV2_Backfill.csv.gz*';
+-- // [STATUS=tbd] : SELECT * FROM STG.CREO_MessageContactV2_HIST LIMIT 10;
+
+
+
+-- // SELECT DEV_JS.ETL.COPYSELECT('STG','CREO_MessagePartV2_HIST',3);
+COPY INTO DEV_JS.STG.CREO_MessagePartV2_HIST FROM (
+    SELECT 
+        METADATA$FILENAME, CURRENT_TIMESTAMP(), to_date('2023-06-01'), 
+        ($1)::bigint, -- $1: MESSAGE_PART_KEY BIGINT NULL 
+		($2)::bigint, -- $2: MESSAGE_KEY BIGINT NULL 
+		($3)::varchar, -- $3: CONTENT_TYPE VARCHAR(8000) NULL 
+		($4)::varchar, -- $4: FILENAME VARCHAR(8000) NULL 
+		($5)::variant -- $6: DATA VARIANT NOT NULL
+    FROM @ETL.INBOUND
+)
+FILE_FORMAT = (
+    FORMAT_NAME = ARES.STG.LD_CSV_PIPE_SH1_EON_GZ
+)
+PATTERN = 'inbound/CREO/Backfill/MessagePartV2/MessagePartV2_Backfill.csv.gz*';
+-- // [STATUS=tbd] : SELECT * FROM STG.CREO_MessagePartV2_HIST LIMIT 10;
+
+
+
+-- // SELECT DEV_JS.ETL.COPYSELECT('STG','CREO_DeadMessages2_HIST',3);
+COPY INTO DEV_JS.STG.CREO_DeadMessages2_HIST FROM (
+    SELECT 
+        METADATA$FILENAME, CURRENT_TIMESTAMP(), to_date('2023-06-01'), 
+        ($1)::bigint, -- $1: MESSAGE_KEY BIGINT NOT NULL 
+		($2)::varchar, -- $2: SUBJECT VARCHAR(8000) NOT NULL 
+		to_timestamp_ntz($3), -- $3: DATE_ENTERED TIMESTAMP_LTZ NOT NULL 
+		to_timestamp_ntz($4), -- $4: DATE_SENT TIMESTAMP_LTZ NOT NULL 
+		($5)::varchar, -- $5: EXCEPTION VARCHAR(8000) NOT NULL 
+		($6)::int, -- $6: CONTAINER_KEY INT NOT NULL 
+		($7)::int, -- $7: COMMUNICATION_MAILING_KEY INT NOT NULL 
+		($8)::int, -- $8: TEMPLATE_KEY INT NOT NULL 
+		($9)::boolean, -- $9: IS_PRODUCTION BOOLEAN NOT NULL 
+		($10)::bigint, -- $10: DATASET_ROW_KEY BIGINT NOT NULL 
+		($11)::varchar, -- $11: SERVER VARCHAR(8000) NOT NULL 
+		($12)::varchar, -- $12: MESSAGE_ID VARCHAR(36) NOT NULL 
+		($13)::smallint, -- $13: TYPE SMALLINT NOT NULL 
+		($14)::int, -- $14: NUM_EXCEPTIONS INT NOT NULL 
+		($15)::int, -- $15: DELIVERY_STATUS_KEY INT NOT NULL 
+		($16)::bigint, -- $16: IN_REPLY_TO_MESSAGE_KEY BIGINT NOT NULL 
+		($17)::smallint, -- $17: DIRECTION SMALLINT NOT NULL 
+		to_timestamp_ntz($18), -- $18: SEND_AFTER TIMESTAMP_LTZ NOT NULL 
+		($19)::bigint, -- $19: SEND_AFTER_MESSAGE_KEY BIGINT NOT NULL 
+		($20)::boolean -- $21: IS_FINISHED BOOLEAN NULL
+    FROM @ETL.INBOUND
+)
+FILE_FORMAT = (
+    FORMAT_NAME = ARES.STG.LD_CSV_PIPE_SH1_EON_GZ
+)
+PATTERN = 'inbound/CREO/Backfill/DeadMessages2/DeadMessages2_Backfill.csv.gz*';
+-- // [STATUS=tbd] : SELECT * FROM STG.CREO_DeadMessages2_HIST LIMIT 10;
+
+
+
+-- // SELECT DEV_JS.ETL.COPYSELECT('STG','CREO_WebHook_HIST',3);
+COPY INTO DEV_JS.STG.CREO_WebHook_HIST FROM (
+    SELECT 
+        METADATA$FILENAME, CURRENT_TIMESTAMP(), to_date('2023-06-01'), 
+        ($1)::int, -- $1: WEBHOOK_KEY INT NOT NULL 
+		($2)::int, -- $2: CONTAINER_KEY INT NOT NULL 
+		($3)::int, -- $3: TYPE INT NOT NULL 
+		($4)::varchar, -- $4: URL VARCHAR(8000) NOT NULL 
+		($5)::varchar, -- $5: EVENT_NAME VARCHAR(8000) NOT NULL 
+		to_timestamp_ntz($6) -- $7: DATE_ENTERED TIMESTAMP_LTZ NULL
+    FROM @ETL.INBOUND
+)
+FILE_FORMAT = (
+    FORMAT_NAME = ARES.STG.LD_CSV_PIPE_SH1_EON_GZ
+)
+PATTERN = 'inbound/CREO/Backfill/WebHook/WebHook_Backfill.csv.gz*';
+-- // [STATUS=tbd] : SELECT * FROM STG.CREO_WebHook_HIST LIMIT 10;
+
+
+
+-- // SELECT DEV_JS.ETL.COPYSELECT('STG','CREO_Message_HIST',3);
+COPY INTO DEV_JS.STG.CREO_Message_HIST FROM (
+    SELECT 
+        METADATA$FILENAME, CURRENT_TIMESTAMP(), to_date('2023-06-01'), 
+        ($1)::bigint, -- $1: MESSAGE_KEY BIGINT NULL 
+		($2)::varchar, -- $2: SUBJECT VARCHAR(8000) NULL 
+		to_timestamp_ntz($3), -- $3: DATE_ENTERED TIMESTAMP_LTZ NULL 
+		to_timestamp_ntz($4), -- $4: DATE_SENT TIMESTAMP_LTZ NULL 
+		($5)::varchar, -- $5: EXCEPTION VARCHAR(8000) NULL 
+		($6)::integer, -- $6: CONTAINER_KEY INTEGER NULL 
+		($7)::integer, -- $7: COMMUNICATION_MAILING_KEY INTEGER NULL 
+		($8)::integer, -- $8: TEMPLATE_KEY INTEGER NULL 
+		($9)::boolean, -- $9: IS_PRODUCTION BOOLEAN NULL 
+		($10)::bigint, -- $10: DATASET_ROW_KEY BIGINT NULL 
+		($11)::varchar, -- $11: SERVER VARCHAR(8000) NULL 
+		($12)::varchar, -- $12: MESSAGE_ID VARCHAR(36) NULL 
+		($13)::smallint, -- $13: TYPE SMALLINT NULL 
+		($14)::integer, -- $14: NUM_EXCEPTIONS INTEGER NULL 
+		($15)::integer, -- $15: DELIVERY_STATUS_KEY INTEGER NULL 
+		($16)::bigint, -- $16: IN_REPLY_TO_MESSAGE_KEY BIGINT NULL 
+		($17)::smallint, -- $17: DIRECTION SMALLINT NULL 
+		to_timestamp_ntz($18), -- $18: SEND_AFTER TIMESTAMP_LTZ NULL 
+		($19)::bigint, -- $19: SEND_AFTER_MESSAGE_KEY BIGINT NULL 
+		($20)::boolean, -- $20: IS_FINISHED BOOLEAN NULL 
+		($21)::varchar, -- $21: HEADERS VARCHAR(8000) NULL 
+		($22)::varchar -- $23: VENDOR_ID VARCHAR(8000) NOT NULL
+    FROM @ETL.INBOUND
+)
+FILE_FORMAT = (
+    FORMAT_NAME = ARES.STG.LD_CSV_PIPE_SH1_EON_GZ
+)
+PATTERN = 'inbound/CREO/Backfill/Message/Message_Backfill.csv.gz*';
+-- // [STATUS=tbd] : SELECT * FROM STG.CREO_Message_HIST LIMIT 10;
+
+
+
+-- // SELECT DEV_JS.ETL.COPYSELECT('STG','CREO_DatasetRow_HIST',3);
+COPY INTO DEV_JS.STG.CREO_DatasetRow_HIST FROM (
+    SELECT 
+        METADATA$FILENAME, CURRENT_TIMESTAMP(), to_date('2023-06-01'), 
+        ($1)::bigint, -- $1: DATASET_ROW_KEY BIGINT NOT NULL 
+		($2)::integer, -- $2: DATASET_KEY INTEGER NOT NULL 
+		($3)::boolean -- $4: HAS_MESSAGE BOOLEAN NULL
+    FROM @ETL.INBOUND
+)
+FILE_FORMAT = (
+    FORMAT_NAME = ARES.STG.LD_CSV_PIPE_SH1_EON_GZ
+)
+PATTERN = 'inbound/CREO/Backfill/DatasetRow/DatasetRow_Backfill.csv.gz*';
+-- // [STATUS=tbd] : SELECT * FROM STG.CREO_DatasetRow_HIST LIMIT 10;
+
+
+
+-- // SELECT DEV_JS.ETL.COPYSELECT('STG','CREO_MessageContact_HIST',3);
+COPY INTO DEV_JS.STG.CREO_MessageContact_HIST FROM (
+    SELECT 
+        METADATA$FILENAME, CURRENT_TIMESTAMP(), to_date('2023-06-01'), 
+        ($1)::integer, -- $1: MESSAGE_CONTACT_KEY INTEGER NOT NULL 
+		($2)::bigint, -- $2: MESSAGE_KEY BIGINT NOT NULL 
+		($3)::integer, -- $3: CONTACT_KEY INTEGER NOT NULL 
+		($4)::integer -- $5: TYPE INTEGER NULL
+    FROM @ETL.INBOUND
+)
+FILE_FORMAT = (
+    FORMAT_NAME = ARES.STG.LD_CSV_PIPE_SH1_EON_GZ
+)
+PATTERN = 'inbound/CREO/Backfill/MessageContact/MessageContact_Backfill.csv.gz*';
+-- // [STATUS=tbd] : SELECT * FROM STG.CREO_MessageContact_HIST LIMIT 10;
+
+
+
+-- // SELECT DEV_JS.ETL.COPYSELECT('STG','CREO_DatasetCell_HIST',3);
+COPY INTO DEV_JS.STG.CREO_DatasetCell_HIST FROM (
+    SELECT 
+        METADATA$FILENAME, CURRENT_TIMESTAMP(), to_date('2023-06-01'), 
+        ($1)::bigint, -- $1: DATASET_ROW_KEY BIGINT NOT NULL 
+		($2)::integer, -- $2: DATASET_COLUMN_KEY INTEGER NOT NULL 
+		($3)::bigint -- $4: DATASET_VALUE_KEY BIGINT NULL
+    FROM @ETL.INBOUND
+)
+FILE_FORMAT = (
+    FORMAT_NAME = ARES.STG.LD_CSV_PIPE_SH1_EON_GZ
+)
+PATTERN = 'inbound/CREO/Backfill/DatasetCell/DatasetCell_Backfill.csv.gz*';
+-- // [STATUS=tbd] : SELECT * FROM STG.CREO_DatasetCell_HIST LIMIT 10;
+
+
+
+-- // SELECT DEV_JS.ETL.COPYSELECT('STG','CREO_Global_HIST',3);
+COPY INTO DEV_JS.STG.CREO_Global_HIST FROM (
+    SELECT 
+        METADATA$FILENAME, CURRENT_TIMESTAMP(), to_date('2023-06-01'), 
+        ($1)::decimal, -- $2: APP_VERSION DECIMAL(38,38) NULL
+    FROM @ETL.INBOUND
+)
+FILE_FORMAT = (
+    FORMAT_NAME = ARES.STG.LD_CSV_PIPE_SH1_EON_GZ
+)
+PATTERN = 'inbound/CREO/Backfill/Global/Global_Backfill.csv.gz*';
+-- // [STATUS=tbd] : SELECT * FROM STG.CREO_Global_HIST LIMIT 10;
+
+
+
+-- // SELECT DEV_JS.ETL.COPYSELECT('STG','CREO_MessageContactV2_HIST',3);
+COPY INTO DEV_JS.STG.CREO_MessageContactV2_HIST FROM (
+    SELECT 
+        METADATA$FILENAME, CURRENT_TIMESTAMP(), to_date('2023-06-01'), 
+        ($1)::bigint, -- $1: MESSAGE_CONTACT_KEY BIGINT NOT NULL 
+		($2)::bigint, -- $2: MESSAGE_KEY BIGINT NOT NULL 
+		($3)::integer, -- $3: CONTACT_KEY INTEGER NOT NULL 
+		($4)::integer -- $5: TYPE INTEGER NULL
+    FROM @ETL.INBOUND
+)
+FILE_FORMAT = (
+    FORMAT_NAME = ARES.STG.LD_CSV_PIPE_SH1_EON_GZ
+)
+PATTERN = 'inbound/CREO/Backfill/MessageContactV2/MessageContactV2_Backfill.csv.gz*';
+-- // [STATUS=tbd] : SELECT * FROM STG.CREO_MessageContactV2_HIST LIMIT 10;
+
+
+
+-- // SELECT DEV_JS.ETL.COPYSELECT('STG','CREO_MessageDeliveryStatus_HIST',3);
+COPY INTO DEV_JS.STG.CREO_MessageDeliveryStatus_HIST FROM (
+    SELECT 
+        METADATA$FILENAME, CURRENT_TIMESTAMP(), to_date('2023-06-01'), 
+        ($1)::bigint, -- $1: MESSAGE_DELIVERY_STATUS_KEY BIGINT NULL 
+		($2)::bigint, -- $2: MESSAGE_KEY BIGINT NULL 
+		($3)::integer, -- $3: DELIVERY_STATUS_KEY INTEGER NULL 
+		to_timestamp_ntz($4), -- $4: DATE_ENTERED TIMESTAMP_LTZ NULL 
+		($5)::varchar -- $6: DETAIL VARCHAR(8000) NOT NULL
+    FROM @ETL.INBOUND
+)
+FILE_FORMAT = (
+    FORMAT_NAME = ARES.STG.LD_CSV_PIPE_SH1_EON_GZ
+)
+PATTERN = 'inbound/CREO/Backfill/MessageDeliveryStatus/MessageDeliveryStatus_Backfill.csv.gz*';
+-- // [STATUS=tbd] : SELECT * FROM STG.CREO_MessageDeliveryStatus_HIST LIMIT 10;
+
+
+
+-- // SELECT DEV_JS.ETL.COPYSELECT('STG','CREO_MessagePart_HIST',3);
+COPY INTO DEV_JS.STG.CREO_MessagePart_HIST FROM (
+    SELECT 
+        METADATA$FILENAME, CURRENT_TIMESTAMP(), to_date('2023-06-01'), 
+        ($1)::integer, -- $1: MESSAGE_PART_KEY INTEGER NOT NULL 
+		($2)::bigint, -- $2: MESSAGE_KEY BIGINT NOT NULL 
+		($3)::varchar, -- $3: CONTENT_TYPE VARCHAR(8000) NOT NULL 
+		($4)::varchar, -- $4: FILENAME VARCHAR(8000) NOT NULL 
+		($5)::variant, -- $5: DATA VARIANT NOT NULL 
+		($6)::boolean -- $7: IS_COMPRESSED BOOLEAN NULL
+    FROM @ETL.INBOUND
+)
+FILE_FORMAT = (
+    FORMAT_NAME = ARES.STG.LD_CSV_PIPE_SH1_EON_GZ
+)
+PATTERN = 'inbound/CREO/Backfill/MessagePart/MessagePart_Backfill.csv.gz*';
+-- // [STATUS=tbd] : SELECT * FROM STG.CREO_MessagePart_HIST LIMIT 10;
+
+
+
+-- // SELECT DEV_JS.ETL.COPYSELECT('STG','CREO_MessagePartV2_HIST',3);
+COPY INTO DEV_JS.STG.CREO_MessagePartV2_HIST FROM (
+    SELECT 
+        METADATA$FILENAME, CURRENT_TIMESTAMP(), to_date('2023-06-01'), 
+        ($1)::bigint, -- $1: MESSAGE_PART_KEY BIGINT NULL 
+		($2)::bigint, -- $2: MESSAGE_KEY BIGINT NULL 
+		($3)::varchar, -- $3: CONTENT_TYPE VARCHAR(8000) NULL 
+		($4)::varchar, -- $4: FILENAME VARCHAR(8000) NULL 
+		($5)::variant -- $6: DATA VARIANT NOT NULL
+    FROM @ETL.INBOUND
+)
+FILE_FORMAT = (
+    FORMAT_NAME = ARES.STG.LD_CSV_PIPE_SH1_EON_GZ
+)
+PATTERN = 'inbound/CREO/Backfill/MessagePartV2/MessagePartV2_Backfill.csv.gz*';
+-- // [STATUS=tbd] : SELECT * FROM STG.CREO_MessagePartV2_HIST LIMIT 10;
+
