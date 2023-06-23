@@ -16,11 +16,11 @@ This repository contains scripts and instructions to automate many of the steps 
 
 ## **Migration Steps 📝**
 
-1. **IN DEVELOPMENT**: Run the **`scripts/1_*.py`** Python script on the MSSQL server to export data from MSSQL database(s) to CSV file(s). Make sure to change the database at the top of the script accordingly.
+1. **IN DEVELOPMENT**: Run the **`scripts/1_*.py`** Python script on the MSSQL server to export data from MSSQL database(s) to CSV file(s).
     
     > Note: 🚧 This script is still under development. For now, you can use sqlcmd or invoke-sqlcmd to export data from MSSQL to CSV.
     > 
-2. Run the **`mssql/2_*.sql`** query in MSSQL to retrieve table names and table definitions (with MSSQL data types changed to Snowflake data types). Export the query results for each database as an Excel file. Save the Excel file(s) in the **`data/`** folder with the same name as the database.
+2. Connect to the MSSQL database and run the **`mssql/2_*.sql`** query to retrieve table names and table definitions (with MSSQL data types changed to Snowflake data types). Make sure to change **`USE database;`** at the top of the script accordingly. Run the script (you may need to re-run **`SELECT * from #TempTable`** once it's done to get a clean view of the query results). Export the query result as an Excel file and save the Excel file in the **`data/`** folder with the same name as your database.
 3. Run the **`scripts/3_*.py`** Python script to generate **`CREATE TABLE`** and **`COPY INTO`** Snowflake scripts. You may need to modify the code slightly to achieve the desired format and results. The formatted SQL scripts will be exported to the **`sfsql/`** folder.
 4. Copy and paste the **`CREATE TABLE`** and **`COPY INTO`** SQL queries into a Snowflake worksheet. Execute the scripts in the Snowflake UI for further troubleshooting and execution.
 
