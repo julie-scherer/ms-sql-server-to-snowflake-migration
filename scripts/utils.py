@@ -1,19 +1,29 @@
 
 class Utils:
     ## Microsoft SQL server
-    MSSQL_SERVER='rds-ue2-prod-data-read-replica-creo01.cmctpgdigwuk.us-east-2.rds.amazonaws.com'
+    MSSQL_SERVER = 'rds-ue2-prod-data-read-replica-creo01.cmctpgdigwuk.us-east-2.rds.amazonaws.com'
+
+    ## Path to root directory of project 
+    PROJECT_DIR = fr"C:\Users\JulieScherer\OneDrive - curo.com\migration-automation-pipeline"
 
     ## Path to export results
-    # OUTPUT_DIR = '\\ictfs01\SharedUSA\IT\Batch\DW\BCP' # shared drive
-    # OUTPUT_DIR = fr"C:\Users\JulieScherer\Creo-JS\CSVFiles" # pc local
-    OUTPUT_DIR=fr"C:\Users\JulieScherer\OneDrive - curo.com\Creo-JS\CSVFiles" # pc onedrive
+    # OUTPUT_DIR = '\\ictfs01\SharedUSA\IT\Batch\DW\BCP' # team shared drive
+    OUTPUT_DIR = fr"C:\Users\JulieScherer\OneDrive - curo.com\migration-automation-pipeline\csvs" # onedrive on PC/VM
 
-    MAX_WORKERS=7
-    TIMEOUT_SECONDS=300
+    ## Databases and table names -- ('database_name', ['column_name', 'column_name', ... ])
+    # ** ONLY USE TABLES WITH LESS THAN MILLION RECORDS **
+    DATABASE1 = ('CREO', ['ApprovalRequest', 'ApprovalRequestItem', 'Campaign', 'CampaignType', 'Communication', 'CommunicationMailing', 'Config', 'ConfigHistory', 'ContactType', 'Container', 'Dataset', 'DatasetColumn', 'Datasource', 'DeadMessages', 'DeadMessages2', 'DeliveryStatus', 'Emoji', 'Folder', 'FolderContact', 'FolderMessage', 'Global', 'Log', 'MessageContact', 'MessageContactType', 'MessagePart',  'MessageStatusQueue', 'MessageType', 'Package', 'Parameter', 'Rule', 'Template', 'TemplateRule', 'TemplateType', 'TempMessage', 'User', 'WebHook'])
+    # // DATABASE1_OG = ('CREO', ['ApprovalRequest', 'ApprovalRequestItem', 'Campaign', 'CampaignType', 'Communication', 'CommunicationMailing', 'Config', 'ConfigHistory', 'Contact', 'ContactType', 'Container', 'Dataset', 'DatasetCell', 'DatasetColumn', 'DatasetRow', 'DatasetValue', 'Datasource', 'DeadMessages', 'DeadMessages2', 'DeliveryStatus', 'Emoji', 'Folder', 'FolderContact', 'FolderMessage', 'Global', 'Log', 'Message', 'MessageContact', 'MessageContactType', 'MessageContactV2', 'MessageDeliveryStatus', 'MessagePart', 'MessagePartV2', 'MessageStatusQueue', 'MessageType', 'Package', 'PackageTemplate', 'Parameter', 'Rule', 'Template', 'TemplateRule', 'TemplateType', 'TempMessage', 'User', 'WebHook'])
+    # // DATABASE1_TBLS_REMOVED = ['Contact', 'DatasetCell', 'DatasetRow', 'DatasetValue', 'Message', 'MessageContactV2', 'MessageDeliveryStatus', 'MessagePartV2', 'PackageTemplate' ]
+    DATABASE2 = ('CREOArchive', ['Global', 'MessageContact', 'MessagePart'] )
+    # // DATABASE2_OG = ('CREOArchive', ['DatasetCell', 'DatasetRow', 'Global', 'Message', 'MessageContact', 'MessageContactV2', 'MessageDeliveryStatus', 'MessagePart', 'MessagePartV2'] )
+    DATABASE3 = ('CREOArchive2', ['Global', 'MessageContact', 'MessagePart'] )
+    # // DATABASE3_OG = ('CREOArchive2', ['DatasetCell', 'DatasetRow', 'Global', 'Message', 'MessageContact', 'MessageContactV2', 'MessageDeliveryStatus', 'MessagePart', 'MessagePartV2'] )
 
-    DATABASE1=('CREO', ['Log', 'Message', 'Log', 'Message', 'Package',  'Rule','User', 'Config', 'Template', 'Container', 'PackageTemplate', 'TemplateRule', 'Campaign', 'Communication', 'CommunicationMailing', 'Dataset', 'DatasetCell', 'DatasetColumn', 'DatasetRow', 'DatasetValue', 'Datasource', 'DeliveryStatus', 'Emoji', 'Folder', 'MessageDeliveryStatus', 'FolderContact', 'FolderMessage', 'Parameter', 'MessageStatusQueue', 'Global', 'CampaignType', 'TempMessage', 'DeadMessages', 'ContactType', 'ApprovalRequest', 'MessageContactType', 'ApprovalRequestItem', 'MessageType', 'ConfigHistory', 'TemplateType', 'Contact', 'MessageContact', 'MessagePart', 'MessageContactV2', 'MessagePartV2', 'DeadMessages2', 'WebHook'] )
-    DATABASE2=('CREOArchive', ['Message', 'Message', 'DatasetRow', 'MessageContact', 'DatasetCell', 'Global', 'MessageContactV2', 'MessageDeliveryStatus', 'MessagePart', 'MessagePartV2'])
-    DATABASE3=('CREOArchive2', ['Message', 'Message', 'DatasetRow', 'MessageContact', 'DatasetCell', 'Global', 'MessageContactV2', 'MessageDeliveryStatus', 'MessagePart', 'MessagePartV2'])
+    MAX_WORKERS = 7
+    TIMEOUT_SECONDS = 90
+
+
 
 def create_tbl_syntax(table_name, schema):
     return f"""
@@ -27,7 +37,6 @@ CREATE TABLE IF NOT EXISTS STG.CREO_{table_name.upper()}_HIST (
 -- // [STATUS=tbd] : SELECT * FROM STG.CREO_{table_name}_HIST LIMIT 10;
 
 """
-
 
 def copy_into_tbl_syntax(table_name, casted_cols):
     return f"""

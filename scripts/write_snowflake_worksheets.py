@@ -1,14 +1,8 @@
 import os
 import openpyxl
 import re
-from dotenv import dotenv_values
-
-# Load environment variables from .env file
-env_vars = dotenv_values()
 
 from utils import create_tbl_syntax, copy_into_tbl_syntax, Utils
-
-DATABASE1, DATABASE2, DATABASE3, MSSQL_SERVER, OUTPUT_DIR, MAX_WORKERS, TIMEOUT_SECONDS = Utils.DATABASE1, Utils.DATABASE2, Utils.DATABASE3, Utils.MSSQL_SERVER, Utils.OUTPUT_DIR, Utils.MAX_WORKERS, Utils.TIMEOUT_SECONDS
 
 ## Get the current working directory
 current_dir=os.getcwd()
@@ -118,10 +112,3 @@ def write_snowflake_queries():
 
 if __name__ == '__main__':
     write_snowflake_queries()
-
-
-            # ## Raise a warning if there's duplicate tables
-                # elif table_name in schemas_found and raw_schema != schemas_found.get(table_name):
-                #     raise Warning(f"Warning: Found duplicate tables for {table_name}. This is likely caused by either:\n"
-                #                     "\t- Different schemas for the same table across databases\n"
-                #                     "\t- Two tables have the same name\n")

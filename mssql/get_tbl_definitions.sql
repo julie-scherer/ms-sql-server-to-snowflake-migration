@@ -14,8 +14,7 @@ DECLARE @TableName NVARCHAR(128);
 DECLARE @ColumnData VARCHAR (MAX);
 
 DECLARE tableCursor CURSOR FOR
-SELECT name
-FROM sys.tables;
+SELECT name FROM sys.tables;
 
 OPEN tableCursor;
 FETCH NEXT FROM tableCursor INTO @TableName;
@@ -32,7 +31,7 @@ BEGIN
                 WHEN t.name = 'tinyint' THEN 'SMALLINT'
                 WHEN t.name = 'int' THEN 'INT'
                 WHEN t.name = 'bigint' THEN 'BIGINT'
-                WHEN t.name = 'decimal' THEN CONCAT('DECIMAL(', t.precision, ',', t.scale, ')')
+                WHEN t.name = 'decimal' THEN CONCAT('DECIMAL(', t.precision, ',', 0, ')')
                 WHEN t.name = 'numeric' THEN 'NUMERIC'
                 WHEN t.name = 'date' THEN 'DATE'
                 WHEN t.name = 'time' THEN 'TIME'
@@ -78,4 +77,5 @@ DEALLOCATE tableCursor;
 
 -- Retrieve the results
 SELECT *
-FROM #TableStats;
+FROM #TableStats
+ORDER BY TableName;

@@ -1,2 +1,6 @@
 openpyxl
 python-dotenv
+pandas
+pyodbc
+sqlalchemy
+connectorx
