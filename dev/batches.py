@@ -142,15 +142,4 @@ def bcp_to_csv(database_name, table_name,):
 
 
 
-import pandas as pd
 
-# Assuming you have a CSV file named 'exported_file.csv' exported by BCP
-# Replace empty strings and whitespace with NaN while reading
-na_values = ['', ' ']
-df = pd.read_csv('exported_file.csv', na_values=na_values)
-
-# Replace NaN with 'NULL'
-df.fillna('NULL', inplace=True)
-
-# Save back to CSV
-df.to_csv('updated_file.csv', index=False)
