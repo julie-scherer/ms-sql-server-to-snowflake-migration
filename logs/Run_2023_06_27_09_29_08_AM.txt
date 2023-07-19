@@ -1,0 +1,496 @@
+[INFO] 2023-06-27 09:29:08,338:  
+*** Starting CREO ***
+[INFO] 2023-06-27 09:29:08,354:  Submitted ApprovalRequest task to executor.
+[INFO] 2023-06-27 09:29:08,354:  Submitted ApprovalRequestItem task to executor.
+[INFO] 2023-06-27 09:29:08,354:  Submitted Campaign task to executor.
+[INFO] 2023-06-27 09:29:08,354:  Submitted CampaignType task to executor.
+[INFO] 2023-06-27 09:29:08,354:  Submitted Communication task to executor.
+[INFO] 2023-06-27 09:29:08,354:  Submitted CommunicationMailing task to executor.
+[INFO] 2023-06-27 09:29:08,369:  Submitted Config task to executor.
+[INFO] 2023-06-27 09:29:08,369:  Submitted ConfigHistory task to executor.
+[INFO] 2023-06-27 09:29:08,369:  Submitted ContactType task to executor.
+[INFO] 2023-06-27 09:29:08,369:  Submitted Container task to executor.
+[INFO] 2023-06-27 09:29:08,369:  Submitted Dataset task to executor.
+[INFO] 2023-06-27 09:29:08,369:  Submitted DatasetColumn task to executor.
+[INFO] 2023-06-27 09:29:08,369:  Submitted Datasource task to executor.
+[INFO] 2023-06-27 09:29:08,369:  Submitted DeadMessages task to executor.
+[INFO] 2023-06-27 09:29:08,369:  Submitted DeadMessages2 task to executor.
+[INFO] 2023-06-27 09:29:08,369:  Submitted DeliveryStatus task to executor.
+[INFO] 2023-06-27 09:29:08,369:  Submitted Emoji task to executor.
+[INFO] 2023-06-27 09:29:08,369:  Submitted Folder task to executor.
+[INFO] 2023-06-27 09:29:08,369:  Submitted FolderContact task to executor.
+[INFO] 2023-06-27 09:29:08,369:  Submitted FolderMessage task to executor.
+[INFO] 2023-06-27 09:29:08,369:  Submitted Global task to executor.
+[INFO] 2023-06-27 09:29:08,369:  Submitted Log task to executor.
+[INFO] 2023-06-27 09:29:08,369:  Submitted MessageContact task to executor.
+[INFO] 2023-06-27 09:29:08,369:  Submitted MessageContactType task to executor.
+[INFO] 2023-06-27 09:29:08,369:  Submitted MessagePart task to executor.
+[INFO] 2023-06-27 09:29:08,369:  Submitted MessageStatusQueue task to executor.
+[INFO] 2023-06-27 09:29:08,369:  Submitted MessageType task to executor.
+[INFO] 2023-06-27 09:29:08,369:  Submitted Package task to executor.
+[INFO] 2023-06-27 09:29:08,369:  Submitted Parameter task to executor.
+[INFO] 2023-06-27 09:29:08,369:  Submitted Rule task to executor.
+[INFO] 2023-06-27 09:29:08,369:  Submitted Template task to executor.
+[INFO] 2023-06-27 09:29:08,369:  Submitted TemplateRule task to executor.
+[INFO] 2023-06-27 09:29:08,369:  Submitted TemplateType task to executor.
+[INFO] 2023-06-27 09:29:08,369:  Submitted TempMessage task to executor.
+[INFO] 2023-06-27 09:29:08,369:  Submitted User task to executor.
+[INFO] 2023-06-27 09:29:08,369:  Submitted WebHook task to executor.
+[INFO] 2023-06-27 09:29:09,197:  
+Read from Config table successful! Table shape: (55, 3) 
+   CONFIG_KEY                                               NAME                                              VALUE
+0           3                       _Data:ReportConnectionString  data source=ictcorpsql02rpt.speedycash.ict.; i...
+1           4                  MessageArchiveProcess:NumMessages                                                100
+2           5                                       DisableQueue                                              false
+3          10          _MessageStatusQueueProcessor:NumToProcess                                                  0
+4          22  SmtpProvider:LoadBalancer:lbsmtp.speedycash.ict:0                       ICTEXCHANGE02.speedycash.ict
+[INFO] 2023-06-27 09:29:09,197:  
+Read from ApprovalRequestItem table successful! Table shape: (0, 3) 
+Empty DataFrame
+Columns: [APPROVAL_REQUEST_ITEM_KEY, APPROVAL_REQUEST_KEY, TEMPLATE_KEY]
+Index: []
+[INFO] 2023-06-27 09:29:09,197:  
+Read from ApprovalRequest table successful! Table shape: (6, 8) 
+   APPROVAL_REQUEST_KEY  STATUS  ... COMMIT_MESSAGE                        PROCESSED_AT
+0                     1       4  ...           None  2021-12-16 14:04:54.1932809 -06:00
+1                     2       4  ...           None  2021-12-16 14:04:54.1932991 -06:00
+2                     3       4  ...           None  2021-12-16 14:04:54.1933040 -06:00
+3                     4       4  ...           None  2021-12-16 14:04:54.1933112 -06:00
+4                     5       4  ...           None  2021-12-16 14:04:54.1933158 -06:00
+
+[5 rows x 8 columns]
+[INFO] 2023-06-27 09:29:09,213:  
+Read from CampaignType table successful! Table shape: (7, 2) 
+   CAMPAIGN_TYPE_KEY           NAME
+0                  1  Transactional
+1                  2      Marketing
+2                  3    Collections
+3                  4          Batch
+4                  5        Archive
+[INFO] 2023-06-27 09:29:09,260:  
+Write to ApprovalRequestItem.csv.gz successful! Saved at C:\Users\JulieScherer\OneDrive - curo.com\migration-automation-pipeline\csvs\CREO\ApprovalRequestItem
+[INFO] 2023-06-27 09:29:09,260:  
+Write to Config.csv.gz successful! Saved at C:\Users\JulieScherer\OneDrive - curo.com\migration-automation-pipeline\csvs\CREO\Config
+[INFO] 2023-06-27 09:29:09,275:  
+Write to ApprovalRequest.csv.gz successful! Saved at C:\Users\JulieScherer\OneDrive - curo.com\migration-automation-pipeline\csvs\CREO\ApprovalRequest
+[INFO] 2023-06-27 09:29:09,275:  
+Write to CampaignType.csv.gz successful! Saved at C:\Users\JulieScherer\OneDrive - curo.com\migration-automation-pipeline\csvs\CREO\CampaignType
+[INFO] 2023-06-27 09:29:09,338:  
+Read from Container table successful! Table shape: (42, 5) 
+   CONTAINER_KEY                   NAME                        DATE_ENTERED  IS_DELETED  IS_DEPRECATED
+0              1     www.speedycash.com  2015-03-05 15:33:00.0000000 +00:00        True           True
+1              2  secure.speedycash.com  2015-03-05 15:33:00.0000000 +00:00        True           True
+2              3       www.cashmoney.ca  2015-03-05 15:33:00.0000000 +00:00       False          False
+3              4    secure.cashmoney.ca  2015-03-05 15:33:00.0000000 +00:00       False          False
+4              5                Testing  2015-04-07 15:50:00.0000000 +00:00       False          False
+[INFO] 2023-06-27 09:29:09,353:  
+Read from ConfigHistory table successful! Table shape: (94, 6) 
+   CONFIG_HISTORY_KEY  CONFIG_KEY  ...                  CHANGED_BY                        DATE_ENTERED
+0                   1          22  ...  SPEEDYCASH\andyedinborough  2021-02-05 12:42:00.1066854 -06:00
+1                   2          23  ...  SPEEDYCASH\andyedinborough  2021-02-05 12:42:03.4273197 -06:00
+2                   3          24  ...  SPEEDYCASH\andyedinborough  2021-02-05 12:42:06.6455092 -06:00
+3                   4          25  ...  SPEEDYCASH\andyedinborough  2021-02-05 12:42:10.4219750 -06:00
+4                   5          25  ...  SPEEDYCASH\andyedinborough  2021-02-05 12:53:08.8597798 -06:00
+
+[5 rows x 6 columns]
+[INFO] 2023-06-27 09:29:09,400:  
+Write to Container.csv.gz successful! Saved at C:\Users\JulieScherer\OneDrive - curo.com\migration-automation-pipeline\csvs\CREO\Container
+[INFO] 2023-06-27 09:29:09,416:  
+Write to ConfigHistory.csv.gz successful! Saved at C:\Users\JulieScherer\OneDrive - curo.com\migration-automation-pipeline\csvs\CREO\ConfigHistory
+[INFO] 2023-06-27 09:29:09,463:  
+Read from Datasource table successful! Table shape: (0, 4) 
+Empty DataFrame
+Columns: [DATASOURCE_KEY, NAME, DEFINITION, TYPE]
+Index: []
+[INFO] 2023-06-27 09:29:09,525:  
+Read from ContactType table successful! Table shape: (5, 2) 
+   CONTACT_TYPE_KEY DESCRIPTION
+0                 0        None
+1                 1       Email
+2                 2       Phone
+3                 3         iOS
+4                 4     Android
+[INFO] 2023-06-27 09:29:09,525:  
+Write to Datasource.csv.gz successful! Saved at C:\Users\JulieScherer\OneDrive - curo.com\migration-automation-pipeline\csvs\CREO\Datasource
+[INFO] 2023-06-27 09:29:09,556:  
+Write to ContactType.csv.gz successful! Saved at C:\Users\JulieScherer\OneDrive - curo.com\migration-automation-pipeline\csvs\CREO\ContactType
+[INFO] 2023-06-27 09:29:09,619:  
+Read from DeadMessages table successful! Table shape: (17, 20) 
+   MESSAGE_KEY                                 SUBJECT  ... SEND_AFTER_MESSAGE_KEY IS_FINISHED
+0    221405755  Your loan payment is due on 11/05/2019  ...                   None       False
+1    222599628  Your loan payment is due on 10/26/2019  ...                   None       False
+2    225198116  Your loan payment is due on 11/08/2019  ...                   None       False
+3    225198129  Your loan payment is due on 11/08/2019  ...                   None       False
+4    225451915  Your loan payment is due on 11/29/2019  ...                   None       False
+
+[5 rows x 20 columns]
+[INFO] 2023-06-27 09:29:09,650:  
+Write to DeadMessages.csv.gz successful! Saved at C:\Users\JulieScherer\OneDrive - curo.com\migration-automation-pipeline\csvs\CREO\DeadMessages
+[INFO] 2023-06-27 09:29:09,853:  
+Read from DeadMessages2 table successful! Table shape: (20, 20) 
+   MESSAGE_KEY                                 SUBJECT  ... SEND_AFTER_MESSAGE_KEY IS_FINISHED
+0    216666964                                Payment   ...                   None       False
+1    218436561                        Loan Application  ...                   None       False
+2    223714731                          Theressa slade  ...                   None       False
+3    223716246                                c.powell  ...                   None       False
+4    225766209  Your loan payment is due on 02/08/2019  ...                   None       False
+
+[5 rows x 20 columns]
+[INFO] 2023-06-27 09:29:09,869:  
+Read from Campaign table successful! Table shape: (1820, 20) 
+   CAMPAIGN_KEY                       NAME  CONTAINER_KEY  ...  IS_PRIORITY  SEND_WITHOUT_PREFERENCES  REASON_DISABLED
+0             1  Password Change Requested             19  ...         True                     False             None
+1             2      Email Address Changed             19  ...        False                     False             None
+2             3        New Account Created             19  ...        False                     False             None
+3             4             Loan Rescinded             19  ...        False                     False             None
+4             5         Auto Pay Cancelled             19  ...        False                     False             None
+
+[5 rows x 20 columns]
+[INFO] 2023-06-27 09:29:09,885:  
+Write to DeadMessages2.csv.gz successful! Saved at C:\Users\JulieScherer\OneDrive - curo.com\migration-automation-pipeline\csvs\CREO\DeadMessages2
+[INFO] 2023-06-27 09:29:09,900:  
+Read from DatasetColumn table successful! Table shape: (2087, 2) 
+   DATASET_COLUMN_KEY                    NAME
+0                   1       ADJUSTED_DUE_DATE
+1                   2              AMOUNT_DUE
+2                   3  BANK_ACCOUNT_LAST_FOUR
+3                   4       BANK_ACCOUNT_NAME
+4                   5          BUSINESS_STATE
+[INFO] 2023-06-27 09:29:09,948:  
+Write to DatasetColumn.csv.gz successful! Saved at C:\Users\JulieScherer\OneDrive - curo.com\migration-automation-pipeline\csvs\CREO\DatasetColumn
+[INFO] 2023-06-27 09:29:09,948:  
+Write to Campaign.csv.gz successful! Saved at C:\Users\JulieScherer\OneDrive - curo.com\migration-automation-pipeline\csvs\CREO\Campaign
+[INFO] 2023-06-27 09:29:10,026:  
+Read from FolderContact table successful! Table shape: (122, 2) 
+   CONTACT_KEY  FOLDER_KEY
+0            4           1
+1            7           2
+2       901240           7
+3       901919           9
+4       903429           5
+[INFO] 2023-06-27 09:29:10,073:  
+Read from DeliveryStatus table successful! Table shape: (1129, 7) 
+   DELIVERY_STATUS_KEY                 NAME            REFERENCE LIMIT_PER_MESSAGE  IS_ERROR  IS_FINAL DESCRIPTION
+0                    1                Error                Error              None      True     False        None
+1                    2            Cancelled            Cancelled              None      True      True        None
+2                    3  No valid recipients  No valid recipients              None     False      True        None
+3                    4               Queued               Queued              None     False     False        None
+4                    5            Delivered            Delivered              None     False      True        None
+[INFO] 2023-06-27 09:29:10,073:  
+Write to FolderContact.csv.gz successful! Saved at C:\Users\JulieScherer\OneDrive - curo.com\migration-automation-pipeline\csvs\CREO\FolderContact
+[INFO] 2023-06-27 09:29:10,135:  
+Read from Communication table successful! Table shape: (2278, 18) 
+   COMMUNICATION_KEY  CAMPAIGN_KEY  IS_ENABLED  ...  IS_PRODUCTION Provider REASON_DISABLED
+0                  1            12       False  ...           True     None            None
+1                  2             3       False  ...           True     None            None
+2                  3             1       False  ...           True     None            None
+3                  4             2       False  ...           True     None            None
+4                  5            21       False  ...           True     None            None
+
+[5 rows x 18 columns]
+[INFO] 2023-06-27 09:29:10,135:  
+Write to DeliveryStatus.csv.gz successful! Saved at C:\Users\JulieScherer\OneDrive - curo.com\migration-automation-pipeline\csvs\CREO\DeliveryStatus
+[INFO] 2023-06-27 09:29:10,213:  
+Read from Folder table successful! Table shape: (79, 6) 
+   FOLDER_KEY                         NAME  CONTAINER_KEY PARENT_FOLDER_KEY  IS_CATCH_ALL  DELETE_AFTER_DAYS
+0           1              01. Email Inbox             19              None          True                NaN
+1           2              01. Email Inbox             20              None          True                NaN
+2           3         02. Due Date Changes             19              None         False                NaN
+3           4         02. Due Date Changes             20              None         False                NaN
+4           5  03. Website Problem / Issue             19              None         False                NaN
+[INFO] 2023-06-27 09:29:10,229:  
+Read from Emoji table successful! Table shape: (1623, 4) 
+   EMOJI_KEY SHORT_NAME                      DESCRIPTION   CODE
+0          1        100            hundred points symbol  1f4af
+1          2       1234         input symbol for numbers  1f522
+2          3   grinning                    grinning face  1f600
+3          4  grimacing                   grimacing face  1f62c
+4          5       grin  grinning face with smiling eyes  1f601
+[INFO] 2023-06-27 09:29:10,245:  
+Write to Communication.csv.gz successful! Saved at C:\Users\JulieScherer\OneDrive - curo.com\migration-automation-pipeline\csvs\CREO\Communication
+[INFO] 2023-06-27 09:29:10,245:  
+Write to Folder.csv.gz successful! Saved at C:\Users\JulieScherer\OneDrive - curo.com\migration-automation-pipeline\csvs\CREO\Folder
+[INFO] 2023-06-27 09:29:10,276:  
+Write to Emoji.csv.gz successful! Saved at C:\Users\JulieScherer\OneDrive - curo.com\migration-automation-pipeline\csvs\CREO\Emoji
+[INFO] 2023-06-27 09:29:10,307:  
+Read from MessageContact table successful! Table shape: (0, 4) 
+Empty DataFrame
+Columns: [MESSAGE_CONTACT_KEY, MESSAGE_KEY, CONTACT_KEY, TYPE]
+Index: []
+[INFO] 2023-06-27 09:29:10,338:  
+Write to MessageContact.csv.gz successful! Saved at C:\Users\JulieScherer\OneDrive - curo.com\migration-automation-pipeline\csvs\CREO\MessageContact
+[INFO] 2023-06-27 09:29:10,385:  
+Read from Global table successful! Table shape: (1, 1) 
+   APP_VERSION
+0       2313.0
+[INFO] 2023-06-27 09:29:10,417:  
+Write to Global.csv.gz successful! Saved at C:\Users\JulieScherer\OneDrive - curo.com\migration-automation-pipeline\csvs\CREO\Global
+[INFO] 2023-06-27 09:29:10,480:  
+Read from Log table successful! Table shape: (0, 14) 
+Empty DataFrame
+Columns: [LOG_KEY, ACTION, DESCRIPTION, IP_ADDRESS, USERNAME, RULE_KEY, TEMPLATE_KEY, PACKAGE_KEY, CONTAINER_KEY, MESSAGE_KEY, CAMPAIGN_KEY, COMMUNICATION_KEY, DATE_ENTERED, SERVER]
+Index: []
+[INFO] 2023-06-27 09:29:10,511:  
+Write to Log.csv.gz successful! Saved at C:\Users\JulieScherer\OneDrive - curo.com\migration-automation-pipeline\csvs\CREO\Log
+[INFO] 2023-06-27 09:29:10,526:  
+Read from MessageContactType table successful! Table shape: (6, 2) 
+   MESSAGE_CONTACT_TYPE_KEY DESCRIPTION
+0                         0        None
+1                         1        From
+2                         2      Sender
+3                         3          To
+4                         4          Cc
+[INFO] 2023-06-27 09:29:10,558:  
+Write to MessageContactType.csv.gz successful! Saved at C:\Users\JulieScherer\OneDrive - curo.com\migration-automation-pipeline\csvs\CREO\MessageContactType
+[INFO] 2023-06-27 09:29:10,589:  
+Read from MessagePart table successful! Table shape: (0, 6) 
+Empty DataFrame
+Columns: [MESSAGE_PART_KEY, MESSAGE_KEY, CONTENT_TYPE, FILENAME, DATA, IS_COMPRESSED]
+Index: []
+[INFO] 2023-06-27 09:29:10,620:  
+Write to MessagePart.csv.gz successful! Saved at C:\Users\JulieScherer\OneDrive - curo.com\migration-automation-pipeline\csvs\CREO\MessagePart
+[INFO] 2023-06-27 09:29:10,666:  
+Read from MessageStatusQueue table successful! Table shape: (0, 7) 
+Empty DataFrame
+Columns: [MESSAGE_STATUS_QUEUE_KEY, DATA, DETAIL, TYPE, ENTERED_AT, CONTAINER_KEY, SERVER]
+Index: []
+[INFO] 2023-06-27 09:29:10,698:  
+Write to MessageStatusQueue.csv.gz successful! Saved at C:\Users\JulieScherer\OneDrive - curo.com\migration-automation-pipeline\csvs\CREO\MessageStatusQueue
+[INFO] 2023-06-27 09:29:10,760:  
+Read from MessageType table successful! Table shape: (5, 2) 
+   MESSAGE_TYPE_KEY        DESCRIPTION
+0                 0               None
+1                 4                SMS
+2                 5  Push Notification
+3                 6              Email
+4                 7         Phone Call
+[INFO] 2023-06-27 09:29:10,791:  
+Write to MessageType.csv.gz successful! Saved at C:\Users\JulieScherer\OneDrive - curo.com\migration-automation-pipeline\csvs\CREO\MessageType
+[INFO] 2023-06-27 09:29:10,869:  
+Read from Parameter table successful! Table shape: (0, 4) 
+Empty DataFrame
+Columns: [PARAMETER_KEY, NAME, DEFINITION, DATASOURCE_KEY]
+Index: []
+[INFO] 2023-06-27 09:29:10,901:  
+Write to Parameter.csv.gz successful! Saved at C:\Users\JulieScherer\OneDrive - curo.com\migration-automation-pipeline\csvs\CREO\Parameter
+[INFO] 2023-06-27 09:29:11,197:  
+Read from Rule table successful! Table shape: (70, 12) 
+   RULE_KEY             NAME PARAMETER_NAME  TYPE  ...                        DATE_ENTERED DEFINITION  WEIGHT  CONTAINER_KEY
+0         1          WDA_DEV    Environment     1  ...  2015-04-23 22:21:00.0000000 +00:00    WDA_DEV     NaN            NaN
+1         2          WDA_PRE    Environment     1  ...  2015-04-23 22:21:00.0000000 +00:00    WDA_PRE     NaN            NaN
+2         3        WDA_TRAIN    Environment     1  ...  2015-04-23 22:21:00.0000000 +00:00  WDA_TRAIN     NaN            NaN
+3         4  15.04 and later        Version     3  ...  2015-06-03 13:44:00.0000000 +00:00    >=15.04     NaN            NaN
+4         5  15.05 and later        Version     3  ...  2015-06-03 13:44:00.0000000 +00:00    >=15.05     NaN            NaN
+
+[5 rows x 12 columns]
+[INFO] 2023-06-27 09:29:11,229:  
+Read from TemplateRule table successful! Table shape: (599, 2) 
+   TEMPLATE_KEY  RULE_KEY
+0           156         7
+1           162         7
+2           165         8
+3           166         8
+4           183         4
+[INFO] 2023-06-27 09:29:11,244:  
+Write to Rule.csv.gz successful! Saved at C:\Users\JulieScherer\OneDrive - curo.com\migration-automation-pipeline\csvs\CREO\Rule
+[INFO] 2023-06-27 09:29:11,260:  
+Write to TemplateRule.csv.gz successful! Saved at C:\Users\JulieScherer\OneDrive - curo.com\migration-automation-pipeline\csvs\CREO\TemplateRule
+[INFO] 2023-06-27 09:29:11,526:  
+Read from TemplateType table successful! Table shape: (8, 2) 
+   TEMPLATE_TYPE_KEY        DESCRIPTION
+0                  0               View
+1                  1               File
+2                  3             Config
+3                  4                SMS
+4                  5  Push Notification
+[INFO] 2023-06-27 09:29:11,526:  
+Read from TempMessage table successful! Table shape: (0, 2) 
+Empty DataFrame
+Columns: [TEMP_MESSAGE_KEY, Json]
+Index: []
+[INFO] 2023-06-27 09:29:11,558:  
+Write to TemplateType.csv.gz successful! Saved at C:\Users\JulieScherer\OneDrive - curo.com\migration-automation-pipeline\csvs\CREO\TemplateType
+[INFO] 2023-06-27 09:29:11,558:  
+Write to TempMessage.csv.gz successful! Saved at C:\Users\JulieScherer\OneDrive - curo.com\migration-automation-pipeline\csvs\CREO\TempMessage
+[INFO] 2023-06-27 09:29:11,619:  
+Read from User table successful! Table shape: (0, 4) 
+Empty DataFrame
+Columns: [USER_KEY, USERNAME, NAME, DATE_ENTERED]
+Index: []
+[INFO] 2023-06-27 09:29:11,619:  
+Read from WebHook table successful! Table shape: (11, 6) 
+   WEBHOOK_KEY  CONTAINER_KEY  ...           EVENT_NAME                        DATE_ENTERED
+0            2             20  ...                 None  2016-06-26 05:52:59.0257367 -05:00
+1            4             20  ...                 None  2016-06-26 05:52:59.0257367 -05:00
+2            7             20  ...                 None  2017-08-02 10:29:48.8028672 -05:00
+3            8              5  ...  communication-saved  2017-10-03 15:25:56.2380523 -05:00
+4            9             25  ...                 None  2017-12-14 07:59:31.8485059 -06:00
+
+[5 rows x 6 columns]
+[INFO] 2023-06-27 09:29:11,651:  
+Read from FolderMessage table successful! Table shape: (15674, 4) 
+   MESSAGE_KEY  FOLDER_KEY LOCKED_BY  IS_READ
+0    492961023          51      None    False
+1    492971231          51      None    False
+2    492992975          51      None    False
+3    492997414          52      None    False
+4    493004256          55      None    False
+[INFO] 2023-06-27 09:29:11,698:  
+Write to User.csv.gz successful! Saved at C:\Users\JulieScherer\OneDrive - curo.com\migration-automation-pipeline\csvs\CREO\User
+[INFO] 2023-06-27 09:29:11,713:  
+Write to WebHook.csv.gz successful! Saved at C:\Users\JulieScherer\OneDrive - curo.com\migration-automation-pipeline\csvs\CREO\WebHook
+[INFO] 2023-06-27 09:29:11,776:  
+Write to FolderMessage.csv.gz successful! Saved at C:\Users\JulieScherer\OneDrive - curo.com\migration-automation-pipeline\csvs\CREO\FolderMessage
+[INFO] 2023-06-27 09:29:12,057:  
+Read from Package table successful! Table shape: (6389, 7) 
+   PACKAGE_KEY  CONTAINER_KEY                      DATE_PUBLISHED  ...  HASH COMMIT_MESSAGE PUBLISHED_BY
+0            1              5  2015-03-31 22:02:00.0000000 +00:00  ...  None           None         None
+1            4              5  2015-03-31 22:01:00.0000000 +00:00  ...  None           None         None
+2            5              4  2015-06-01 20:54:00.0000000 +00:00  ...  None           None         None
+3           16              5  2015-03-31 22:03:00.0000000 +00:00  ...  None           None         None
+4           17              5  2015-03-31 22:07:00.0000000 +00:00  ...  None           None         None
+
+[5 rows x 7 columns]
+[INFO] 2023-06-27 09:29:12,213:  
+Write to Package.csv.gz successful! Saved at C:\Users\JulieScherer\OneDrive - curo.com\migration-automation-pipeline\csvs\CREO\Package
+[INFO] 2023-06-27 09:29:14,823:  
+Read from Template table successful! Table shape: (11232, 10) 
+   TEMPLATE_KEY                       PATH CONTENT  TYPE  ... BASE_TEMPLATE_KEY CONTENT_HASH  NOTES EDITED_BY
+0             1  Views/Shared/_Test.cshtml   b':/'     0  ...               NaN         None   None      None
+1            10  Views/Shared/_Test.cshtml  b'Yo!'     0  ...               NaN         None   None      None
+2            22  Views/Shared/_Test.cshtml   b';['     0  ...               NaN         None   None      None
+3            24  Views/Shared/_Test.cshtml   b';['     0  ...               NaN         None   None      None
+4            26  Views/Shared/_Test.cshtml   b';/'     0  ...               NaN         None   None      None
+
+[5 rows x 10 columns]
+[INFO] 2023-06-27 09:29:40,873:  
+Read from Dataset table successful! Table shape: (896933, 8) 
+   DATASET_KEY                                NAME  ... ROW_COUNT                   ROW_COUNT_UPDATED
+0            1              Data for Loan Complete  ...       NaN                                None
+1            2        Data for New Account Created  ...       NaN                                None
+2            3  Data for Password Change Requested  ...   89352.0  2023-06-26 12:19:18.7023241 -05:00
+3            4  Data for Password Change Requested  ...       NaN                                None
+4            5      Data for Loan Due Date Changed  ...       NaN                                None
+
+[5 rows x 8 columns]
+[INFO] 2023-06-27 09:29:46,093:  
+Read from CommunicationMailing table successful! Table shape: (911475, 11) 
+   COMMUNICATION_MAILING_KEY  COMMUNICATION_KEY  ...                      DATE_COMPLETED                        DATE_UPDATED
+0                          1                  1  ...  2016-06-27 11:31:13.6913348 +00:00  2018-02-08 09:07:13.3447531 -06:00
+1                          2                  2  ...  2016-06-28 17:43:39.5659344 +00:00  2018-02-08 11:04:57.4212631 -06:00
+2                          3                  3  ...  2016-06-26 13:28:51.6297091 +00:00  2018-02-08 11:42:26.6481536 -06:00
+3                          4                  4  ...  2016-06-26 13:09:40.4657559 +00:00  2018-02-08 11:36:20.7230685 -06:00
+4                          5                  5  ...  2016-06-28 17:04:41.7798017 +00:00  2016-09-02 13:00:23.4623424 -05:00
+
+[5 rows x 11 columns]
+[INFO] 2023-06-27 09:29:56,204:  
+Write to Dataset.csv.gz successful! Saved at C:\Users\JulieScherer\OneDrive - curo.com\migration-automation-pipeline\csvs\CREO\Dataset
+[INFO] 2023-06-27 09:30:02,313:  
+Write to Template.csv.gz successful! Saved at C:\Users\JulieScherer\OneDrive - curo.com\migration-automation-pipeline\csvs\CREO\Template
+[INFO] 2023-06-27 09:30:10,876:  
+Write to CommunicationMailing.csv.gz successful! Saved at C:\Users\JulieScherer\OneDrive - curo.com\migration-automation-pipeline\csvs\CREO\CommunicationMailing
+[INFO] 2023-06-27 09:30:11,111:  Executing tasks with a timeout of 90.0.
+[INFO] 2023-06-27 09:30:11,111:  0 completed successfully.
+[INFO] 2023-06-27 09:30:11,111:  1 completed successfully.
+[INFO] 2023-06-27 09:30:11,111:  2 completed successfully.
+[INFO] 2023-06-27 09:30:11,111:  3 completed successfully.
+[INFO] 2023-06-27 09:30:11,111:  4 completed successfully.
+[INFO] 2023-06-27 09:30:11,111:  5 completed successfully.
+[INFO] 2023-06-27 09:30:11,111:  6 completed successfully.
+[INFO] 2023-06-27 09:30:11,111:  7 completed successfully.
+[INFO] 2023-06-27 09:30:11,111:  8 completed successfully.
+[INFO] 2023-06-27 09:30:11,111:  9 completed successfully.
+[INFO] 2023-06-27 09:30:11,111:  10 completed successfully.
+[INFO] 2023-06-27 09:30:11,111:  11 completed successfully.
+[INFO] 2023-06-27 09:30:11,111:  12 completed successfully.
+[INFO] 2023-06-27 09:30:11,111:  13 completed successfully.
+[INFO] 2023-06-27 09:30:11,111:  14 completed successfully.
+[INFO] 2023-06-27 09:30:11,111:  15 completed successfully.
+[INFO] 2023-06-27 09:30:11,111:  16 completed successfully.
+[INFO] 2023-06-27 09:30:11,111:  17 completed successfully.
+[INFO] 2023-06-27 09:30:11,111:  18 completed successfully.
+[INFO] 2023-06-27 09:30:11,111:  19 completed successfully.
+[INFO] 2023-06-27 09:30:11,111:  20 completed successfully.
+[INFO] 2023-06-27 09:30:11,111:  21 completed successfully.
+[INFO] 2023-06-27 09:30:11,111:  22 completed successfully.
+[INFO] 2023-06-27 09:30:11,111:  23 completed successfully.
+[INFO] 2023-06-27 09:30:11,111:  24 completed successfully.
+[INFO] 2023-06-27 09:30:11,111:  25 completed successfully.
+[INFO] 2023-06-27 09:30:11,111:  26 completed successfully.
+[INFO] 2023-06-27 09:30:11,111:  27 completed successfully.
+[INFO] 2023-06-27 09:30:11,111:  28 completed successfully.
+[INFO] 2023-06-27 09:30:11,111:  29 completed successfully.
+[INFO] 2023-06-27 09:30:11,111:  30 completed successfully.
+[INFO] 2023-06-27 09:30:11,111:  31 completed successfully.
+[INFO] 2023-06-27 09:30:11,111:  32 completed successfully.
+[INFO] 2023-06-27 09:30:11,111:  33 completed successfully.
+[INFO] 2023-06-27 09:30:11,111:  34 completed successfully.
+[INFO] 2023-06-27 09:30:11,111:  35 completed successfully.
+[INFO] 2023-06-27 09:30:11,111:  Total time to execute CREO : 62.77260971069336
+[INFO] 2023-06-27 09:30:11,111:  *** CREO finished! ***
+
+[INFO] 2023-06-27 09:30:11,111:  
+*** Starting CREOArchive ***
+[INFO] 2023-06-27 09:30:11,111:  Submitted Global task to executor.
+[INFO] 2023-06-27 09:30:11,111:  Submitted MessageContact task to executor.
+[INFO] 2023-06-27 09:30:11,111:  Submitted MessagePart task to executor.
+[INFO] 2023-06-27 09:30:11,658:  
+Read from MessageContact table successful! Table shape: (0, 4) 
+Empty DataFrame
+Columns: [MESSAGE_CONTACT_KEY, MESSAGE_KEY, CONTACT_KEY, TYPE]
+Index: []
+[INFO] 2023-06-27 09:30:11,658:  
+Read from MessagePart table successful! Table shape: (0, 6) 
+Empty DataFrame
+Columns: [MESSAGE_PART_KEY, MESSAGE_KEY, CONTENT_TYPE, FILENAME, DATA, IS_COMPRESSED]
+Index: []
+[INFO] 2023-06-27 09:30:11,658:  
+Read from Global table successful! Table shape: (1, 1) 
+   APP_VERSION
+0       2313.0
+[INFO] 2023-06-27 09:30:11,705:  
+Write to MessageContact.csv.gz successful! Saved at C:\Users\JulieScherer\OneDrive - curo.com\migration-automation-pipeline\csvs\CREOArchive\MessageContact
+[INFO] 2023-06-27 09:30:11,720:  
+Write to Global.csv.gz successful! Saved at C:\Users\JulieScherer\OneDrive - curo.com\migration-automation-pipeline\csvs\CREOArchive\Global
+[INFO] 2023-06-27 09:30:11,720:  
+Write to MessagePart.csv.gz successful! Saved at C:\Users\JulieScherer\OneDrive - curo.com\migration-automation-pipeline\csvs\CREOArchive\MessagePart
+[INFO] 2023-06-27 09:30:11,720:  Executing tasks with a timeout of 90.0.
+[INFO] 2023-06-27 09:30:11,720:  0 completed successfully.
+[INFO] 2023-06-27 09:30:11,720:  1 completed successfully.
+[INFO] 2023-06-27 09:30:11,720:  2 completed successfully.
+[INFO] 2023-06-27 09:30:11,720:  Total time to execute CREOArchive : 0.6094493865966797
+[INFO] 2023-06-27 09:30:11,720:  *** CREOArchive finished! ***
+
+[INFO] 2023-06-27 09:30:11,720:  
+*** Starting CREOArchive2 ***
+[INFO] 2023-06-27 09:30:11,720:  Submitted Global task to executor.
+[INFO] 2023-06-27 09:30:11,720:  Submitted MessageContact task to executor.
+[INFO] 2023-06-27 09:30:11,720:  Submitted MessagePart task to executor.
+[INFO] 2023-06-27 09:30:12,252:  
+Read from MessagePart table successful! Table shape: (0, 6) 
+Empty DataFrame
+Columns: [MESSAGE_PART_KEY, MESSAGE_KEY, CONTENT_TYPE, FILENAME, DATA, IS_COMPRESSED]
+Index: []
+[INFO] 2023-06-27 09:30:12,252:  
+Read from MessageContact table successful! Table shape: (0, 4) 
+Empty DataFrame
+Columns: [MESSAGE_CONTACT_KEY, MESSAGE_KEY, CONTACT_KEY, TYPE]
+Index: []
+[INFO] 2023-06-27 09:30:12,252:  
+Read from Global table successful! Table shape: (0, 1) 
+Empty DataFrame
+Columns: [APP_VERSION]
+Index: []
+[INFO] 2023-06-27 09:30:12,314:  
+Write to Global.csv.gz successful! Saved at C:\Users\JulieScherer\OneDrive - curo.com\migration-automation-pipeline\csvs\CREOArchive2\Global
+[INFO] 2023-06-27 09:30:12,314:  
+Write to MessagePart.csv.gz successful! Saved at C:\Users\JulieScherer\OneDrive - curo.com\migration-automation-pipeline\csvs\CREOArchive2\MessagePart
+[INFO] 2023-06-27 09:30:12,314:  
+Write to MessageContact.csv.gz successful! Saved at C:\Users\JulieScherer\OneDrive - curo.com\migration-automation-pipeline\csvs\CREOArchive2\MessageContact
+[INFO] 2023-06-27 09:30:12,314:  Executing tasks with a timeout of 90.0.
+[INFO] 2023-06-27 09:30:12,314:  0 completed successfully.
+[INFO] 2023-06-27 09:30:12,314:  1 completed successfully.
+[INFO] 2023-06-27 09:30:12,314:  2 completed successfully.
+[INFO] 2023-06-27 09:30:12,314:  Total time to execute CREOArchive2 : 0.5938720703125
+[INFO] 2023-06-27 09:30:12,314:  *** CREOArchive2 finished! ***
+
