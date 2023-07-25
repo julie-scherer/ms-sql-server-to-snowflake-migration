@@ -46,7 +46,7 @@ BEGIN
                 WHEN t.name = 'hierarchyid' THEN 'VARIANT'
                 WHEN t.name = 'geometry' THEN 'VARIANT'
                 WHEN t.name = 'geography' THEN 'VARIANT'
-                WHEN t.name = 'varbinary' THEN 'VARIANT'
+                WHEN t.name = 'varbinary' THEN CONCAT('BINARY(', t.max_length, ')')
                 WHEN t.name = 'binary' THEN CONCAT('BINARY(', t.max_length, ')')
                 WHEN t.name = 'char' THEN CONCAT('CHAR(', t.max_length, ')')
                 WHEN t.name = 'timestamp' THEN 'TIMESTAMP'
