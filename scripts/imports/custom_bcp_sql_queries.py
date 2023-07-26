@@ -1,6 +1,6 @@
 # from export_mssql_to_csv import batch_size
 
-custom_sql_queries = {
+sql_queries = {
     'CREO_MessageDeliveryStatus_Batch': f"""
     SELECT
         MESSAGE_DELIVERY_STATUS_KEY
