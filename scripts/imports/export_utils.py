@@ -1,7 +1,5 @@
 class Utils:
-    ## Microsoft SQL server
-    # MSSQL_SERVER = 'rds-ue2-prod-data-read-replica-creo01.cmctpgdigwuk.us-east-2.rds.amazonaws.com'
-
+    
     ## Name of Snowflake database
     # SF_DATABASE = 'SRC'
     SF_DATABASE = 'CREO'
@@ -20,11 +18,12 @@ class Utils:
     # BATCH = [ ('CREO', ['Contact']) ]
     # BATCH = [ ('CREO', ['MessageDeliveryStatus']) ]  #! ended at batch 754, start at 755
     # BATCH = [ ('CREO', ['Message']) ]
-    # BATCH = [ ('CREO', ['DatasetValue', 'Contact'] ) ]
 
-    BATCH = [ ('CREO', ['Contact', 'DatasetValue', 'Message', 'MessageDeliveryStatus', 'MessagePartV2'] ) ]
+    # BATCH = [ ('CREO', ['Contact', 'DatasetValue', 'Message', 'MessageDeliveryStatus', 'MessagePartV2'] ) ]
+    
+    BATCH = [ ('CREO', ['DatasetValue'] ) ] ## finished at 215 on 7/26
 
-    ## Dictionary to store approx row counts for each table to skip query to get row count for the table
+    ## (optional) Stores approx row counts for each table, to skip selecting row count in the export CSV script
     #  - - - - - - - - - - - - - - - - - - - - 
     ROW_COUNTS = {
         'Contact': 22585141,
@@ -34,7 +33,7 @@ class Utils:
         'MessagePartV2': 1584766,
     }
 
-    ## Dictionary to store ideal batch size for specified table
+    ## (optional) Specify optimal batch size for a given table
     #  - - - - - - - - - - - - - - - - - - - - 
     BATCH_SIZES = {
         'Contact': 5000000,
@@ -43,6 +42,14 @@ class Utils:
         'MessageDeliveryStatus': 2100000,
         'MessagePartV2': 10000,
     }
+    
+    ## (optional) Specify which batch number to start the export at for a given table
+    #  - - - - - - - - - - - - - - - - - - - - 
+    START_IDX = {
+        'DatasetValue': 216,
+    }
+
+
 
     ## Testing
     #  - - - - - - - - - - - - - - - - - - - - 

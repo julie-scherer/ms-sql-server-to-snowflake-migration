@@ -1,4 +1,4 @@
-## Imports
+## Python library
 import os
 import time
 import logging
@@ -7,46 +7,48 @@ import concurrent.futures  # concurrent.futures module for parallel processing
 import subprocess
 import os
 import pyodbc # connect to mssql via pyodbc driver to get row count
-# import pandas as pd
-
-from utils import Utils
-
+## Local imports
+from imports.export_utils import Utils
+from imports.custom_bcp_sql_queries import sql_queries as csql
 
 # - - - - - - - - - SETTINGS - - - - - - - - - - -
 
 ## STEP 1. Set global configs
 batches = Utils.BATCH # MSSQL databases and their tables
 server = 'rds-ue2-prod-data-read-replica-creo01.cmctpgdigwuk.us-east-2.rds.amazonaws.com' # Microsoft SQL server
-max_workers = 5
-timeout = timedelta(seconds=90)
-available_row_counts = Utils.ROW_COUNTS
-unique_batch_sizes = Utils.BATCH_SIZES
+max_workers = 5 # // max number of workers for parallel processing
+timeout = timedelta(seconds=90) # // set time limit on submitting concurrent tasks to executor
 
-# >> choose your batch size
+# >> choose your default batch size (num records to export in each batch)
 # default_batch_size = 1000000 # 1 mil records
 default_batch_size = 100000 # 100k records
 # default_batch_size = 50000 # 50k records
 # default_batch_size = 10000 # 10k records
 # default_batch_size = 5000 # 5k records
 
-start_batch_idx = 1
+# >> custom settings defined in imports > utils file
+available_row_counts = Utils.ROW_COUNTS
+custom_batch_sizes = Utils.BATCH_SIZES
+custom_start_batch_idx = Utils.START_IDX
 
-testing_small_batch = False
-testing_bcp_only = False
+# >> paramters used for testing
+testing_small_batch = False # True = run only 2 batches
+testing_bcp_only = False # True = only run BCP command to export to CSV locally
 
-
-
-# STEP 2. Define local directories and paths
+## STEP 2. Define local directories and paths
 local_dir = os.getcwd()
 data_dir = os.path.join(local_dir, 'data')
 logs_dir = os.path.join(local_dir, 'logs')
-dst_dir = r'\\ictfs01\SharedUSA\IT\Batch\DW\BCP'
+shared_drive = r'\\ictfs01\SharedUSA\IT\Batch\DW\BCP'
 
+
+## Supporting utilities
+# >> Reusable function to quickly make directories if they don't exist
 def make_dir(dir):
     os.makedirs(dir, exist_ok=True)
     return dir
 
-# STEP 3. Create function to create and save logs
+# >> Function to create and save log file
 def log():
     runs_dir = make_dir(os.path.join(logs_dir, 'runs'))
     log_file_name = datetime.now().strftime(f'Run_%Y%m%d_%H%M.txt')
@@ -70,8 +72,10 @@ def create_bcp_log_file(database_name, table_name, type_folder, filename,):
     Create a BCP log file with a given prefix and return its path.
 
     Parameters:
-        dir (str): Directory where the log file will be created.
-        prefix (str): Prefix for the log file name.
+        database_name (str): Name of the database.
+        table_name (str): Name of the table.
+        type_folder (str): Folder where the log file will be stored.
+        filename (str): Prefix for the log file name.
 
     Returns:
         str: Path to the created BCP log file.
@@ -84,9 +88,19 @@ def create_bcp_log_file(database_name, table_name, type_folder, filename,):
     file = os.path.join(tbl_logs, datetime.now().strftime(f'{filename}.txt'))
     return file
 
-
-# >> Function to get the row count to slip into batches
+# >> Function to get the row count to split exports into batches
 def get_row_count(database_name, table_name, cursor):
+    """
+    Get the number of rows in a table.
+
+    Parameters:
+        database_name (str): Name of the database.
+        table_name (str): Name of the table.
+        cursor: PyODBC cursor object to execute the query.
+
+    Returns:
+        int: Number of rows in the table.
+    """
     logging.info(f"Attempting to get the row count for {table_name}")
     try:
         # Get row count for table
@@ -98,7 +112,6 @@ def get_row_count(database_name, table_name, cursor):
     except Exception as e:
         logging.error(f"Could not fetch row count for {table_name}: {e}")
         return
-
 
 # >> Function to get the primary key column(s) for the specified table
 def get_primary_key_columns(database_name, table_name, cursor):
@@ -140,132 +153,6 @@ def get_primary_key_columns(database_name, table_name, cursor):
         logging.error(f"Could not fetch primary key columns to order by for {table_name}: {e}")
         return
 
-
-
-# ** Main BCP function that's called first
-# >> Checks how many records are in the table and splits into batches if there are more records than the batch size
-def run_bcp_main(database_name, table_name, order_by, num_batches, batch_size, src_tbl_dir, dst_tbl_dir):
-    """
-    Run the BCP utility to export data from a table to CSV files.
-
-    Parameters:
-        database_name (str): Name of the database.
-        table_name (str): Name of the table.
-        src_tbl_dir (str): Source directory to save CSV files.
-        cursor: PyODBC cursor object to execute queries.
-
-    Returns:
-        list: List of paths to the exported CSV files.
-    """
-
-    # Run BCP utility
-    # >> OPTION 1: if there's only 1 batch, export all records into 1 file
-    if num_batches <= 1:
-        logging.info(f"Running BCP command to export all records in {database_name}.dbo.{table_name}:")
-        
-        # create logs and error files
-        bcp_log_file = create_bcp_log_file(database_name, table_name, 'output', f'BCP_Out_{database_name}_{table_name}')
-        bcp_err_file = create_bcp_log_file(database_name, table_name, 'errors', f'BCP_Err_{database_name}_{table_name}')
-
-        csv_filename = f"{table_name}_Backfill.csv"
-        csv_path = os.path.join(src_tbl_dir, csv_filename)
-
-        bcp_query = bcp_export_all_query(database_name, table_name, csv_path)
-        bcp_pigz_move(database_name, table_name, csv_path, bcp_query, bcp_log_file, bcp_err_file, src_tbl_dir, dst_tbl_dir)
-        return
-
-
-    # >> OPTION 2: if there are multiple batches...
-    logging.info(f"Running BCP command to export {database_name}.dbo.{table_name} in batches:")
-
-    offset_row_count = 0
-    fetch_row_count = batch_size
-    for batch_num in range(start_batch_idx, num_batches+1):
-        # create logs and error files
-        bcp_log_file = create_bcp_log_file(database_name, table_name, 'output', f'BCP_Out_{database_name}_{table_name}_B{batch_num}')
-        bcp_err_file = create_bcp_log_file(database_name, table_name, 'errors', f'BCP_Err_{database_name}_{table_name}_B{batch_num}')
-
-        # create file
-        csv_filename = f"{table_name}_Backfill_{batch_num}.csv"
-        csv_path = os.path.join(src_tbl_dir, csv_filename)
-
-        logging.info(f"Batch {batch_num}: {offset_row_count} - {fetch_row_count}")
-        bcp_query = bcp_export_batches_query(database_name, table_name, order_by, offset_row_count, fetch_row_count)
-        bcp_pigz_move(database_name, table_name, csv_path, bcp_query, bcp_log_file, bcp_err_file, src_tbl_dir, dst_tbl_dir, batch_num)
-
-        # update offset row count
-        offset_row_count += batch_size
-
-
-# * If there's less records than the batch size:
-# >> Export all the records into 1 CSV using BCP
-def bcp_export_all_query(database_name, table_name):
-    """
-    Export all records from a table to a CSV file using BCP.
-
-    Parameters:
-        database_name (str): Name of the database.
-        table_name (str): Name of the table.
-        csv_path (str): Path to the CSV file to export.
-
-    Returns:
-        str: Path to the exported CSV file.
-    """
-    from cst_sql import custom_sql_queries as csql
-
-    custom_query = csql.get(f"{database_name}_{table_name}")
-    if custom_query:
-        # logging.info(f"Found custom BCP SQL query")
-        bcp_query = custom_query
-    else:
-        bcp_query = f"""SELECT * FROM {database_name}.[dbo].[{table_name}];"""
-
-    logging.info(f"Query to export all records for {database_name}.dbo.{table_name}: \n{bcp_query}")
-
-    return bcp_query
-
-
-# * If there's more records than the batch size, run in batches:
-# * Export CSVs in batches using OFFSET and FETCH NEXT
-def bcp_export_batches_query(database_name, table_name, order_by, offset_row_count, fetch_row_count, custom_sql=None):
-    """
-    Export records from a table to a CSV file using BCP in batches.
-
-    Parameters:
-        database_name (str): Name of the database.
-        table_name (str): Name of the table.
-        csv_path (str): Path to the CSV file to export.
-        order_by (str): Column(s) to use for ordering the data.
-        offset_row_count (int): Number of rows to skip (OFFSET).
-        fetch_row_count (int): Number of rows to fetch (FETCH NEXT).
-
-    Returns:
-        str: Path to the exported CSV file.
-    """
-    from cst_sql import custom_sql_queries as csql
-
-    custom_query = csql.get(f"{database_name}_{table_name}_Batch")
-    if custom_query:
-        # logging.info(f"Found custom BCP SQL query")
-        # print(f"Found custom BCP SQL query")
-        bcp_query = custom_query + f"""OFFSET {str(offset_row_count)} ROWS FETCH NEXT {str(fetch_row_count)} ROWS ONLY;
-        """
-    else:
-        # BCP query using OFFSET and FETCH to skip the first N rows and select the next N rows
-        bcp_query = f"""
-        SELECT * 
-        FROM {database_name}.[dbo].[{table_name}]
-        ORDER BY {order_by}
-        OFFSET {str(offset_row_count)} ROWS 
-        FETCH NEXT {str(fetch_row_count)} ROWS ONLY;
-        """
-
-    logging.info(f"BCP query to export batch for {database_name}.dbo.{table_name}: \n{bcp_query}")
-    # print(f"Query to export batch: {bcp_query}")
-
-    return bcp_query
-
-
 # >> Function to run BCP utility command
 def bcp_utility_cmd(database_name, table_name, csv_path, bcp_query, log_path, err_path, 
                     delimiter='^', linebreak='\n', codepage="65001", header=False):
@@ -279,11 +166,13 @@ def bcp_utility_cmd(database_name, table_name, csv_path, bcp_query, log_path, er
         bcp_query (str): BCP query to export data from the table.
         log_path (str): Path to the BCP log file.
         err_path (str): Path to the BCP error file.
+        delimiter (str): Field delimiter for the CSV file. Default is '^'.
+        linebreak (str): Row delimiter for the CSV file. Default is '\\n'.
+        codepage (str): Code page for the exported data. Default is "65001" (UTF-8).
+        header (bool): Whether to include headers in the CSV file. Default is False.
 
     Returns:
         bool: True if BCP export is successful, False otherwise.
-    
-        https://learn.microsoft.com/en-us/sql/tools/bcp-utility?view=sql-server-ver16
     """
     try:
         subprocess.run([
@@ -313,26 +202,136 @@ def bcp_utility_cmd(database_name, table_name, csv_path, bcp_query, log_path, er
         logging.info(f">> File Size: {os.path.getsize(csv_path)} bytes")
         return False
 
+# >> Function to export all records into 1 CSV using BCP
+def bcp_export_all_query(database_name, table_name):
+    """
+    Generate the BCP query to export all records from a table to a CSV file.
 
-# - - - - - - - - BCP > PIGZ > MOVE - - - - - - - - - -
-# ** All tasks are bunched into one future so they are executed together
-def bcp_pigz_move(database_name, table_name, csv_path, bcp_query, log_path, err_path, src_tbl_dir, dst_tbl_dir, batch_num=0):
-    exported = bcp_utility_cmd(database_name, table_name, csv_path, bcp_query, log_path, err_path)
+    Parameters:
+        database_name (str): Name of the database.
+        table_name (str): Name of the table.
 
-    if testing_bcp_only:
-        return 
+    Returns:
+        str: BCP query to export all records.
+    """
+    custom_query = csql.get(f"{database_name}_{table_name}")
+    if custom_query:
+        # logging.info(f"Found custom BCP SQL query")
+        bcp_query = custom_query
+    else:
+        bcp_query = f"""SELECT * FROM {database_name}.[dbo].[{table_name}];"""
+
+    logging.info(f"Query to export all records for {database_name}.dbo.{table_name}: \n{bcp_query}")
+    return bcp_query
+
+# >> Function to export CSVs in batches using OFFSET and FETCH NEXT
+def bcp_export_batches_query(database_name, table_name, order_by, offset_row_count, fetch_row_count, custom_sql=None):
+    """
+    Generate the BCP query to export records from a table to a CSV file in batches.
+
+    Parameters:
+        database_name (str): Name of the database.
+        table_name (str): Name of the table.
+        order_by (str): Column(s) to use for ordering the data.
+        offset_row_count (int): Number of rows to skip (OFFSET).
+        fetch_row_count (int): Number of rows to fetch (FETCH NEXT).
+        custom_sql (str, optional): Custom SQL query. Default is None.
+
+    Returns:
+        str: BCP query to export records in batches.
+    """
+    custom_query = csql.get(f"{database_name}_{table_name}_Batch")
+    if custom_query:
+        bcp_query = custom_query + f"""OFFSET {str(offset_row_count)} ROWS FETCH NEXT {str(fetch_row_count)} ROWS ONLY;
+        """
+    else:
+        # BCP query using OFFSET and FETCH to skip the first N rows and select the next N rows
+        bcp_query = f"""
+        SELECT * 
+        FROM {database_name}.[dbo].[{table_name}]
+        ORDER BY {order_by}
+        OFFSET {str(offset_row_count)} ROWS 
+        FETCH NEXT {str(fetch_row_count)} ROWS ONLY;
+        """
+
+    logging.info(f"BCP query to export batch for {database_name}.dbo.{table_name}: \n{bcp_query}")
+    return bcp_query
+
+# >> Function to run the main BCP process
+def run_bcp_main(database_name, table_name, order_by, num_batches, batch_size, src_tbl_dir, dst_tbl_dir):
+    """
+    Run the Python functions to run the BCP pipeline and export data from the MSSQL table into CSV format.
+
+    Parameters:
+        database_name (str): Name of the database.
+        table_name (str): Name of the table.
+        order_by (str): Column(s) to use for ordering the data.
+        num_batches (int): Number of batches to export.
+        batch_size (int): Number of rows per batch.
+        src_tbl_dir (str): Source directory to save CSV files.
+        dst_tbl_dir (str): Destination directory to move CSV files.
+
+    Returns:
+        None
+    """
+    # >> OPTION 1: if there's only 1 batch, export all records into 1 file
+    if num_batches <= 1:
+        logging.info(f"Running BCP command to export all records in {database_name}.dbo.{table_name}:")
+        
+        # create logs and error files
+        bcp_log_file = create_bcp_log_file(database_name, table_name, 'output', f'BCP_Out_{database_name}_{table_name}')
+        bcp_err_file = create_bcp_log_file(database_name, table_name, 'errors', f'BCP_Err_{database_name}_{table_name}')
+
+        csv_filename = f"{table_name}_Backfill.csv"
+        csv_path = os.path.join(src_tbl_dir, csv_filename)
+
+        bcp_query = bcp_export_all_query(database_name, table_name, csv_path)
+        bcp_pigz_move(database_name, table_name, csv_path, bcp_query, bcp_log_file, bcp_err_file, src_tbl_dir, dst_tbl_dir)
+        return
+
+    # >> OPTION 2: if there are multiple batches...
+    logging.info(f"Running BCP command to export {database_name}.dbo.{table_name} in batches:")
+
+    # If we're starting at a custom batch number, we need to adjust start index, as well as the OFFSET value
+    if custom_start_batch_idx.get(table_name):
+        start_batch_idx = custom_start_batch_idx[table_name]
+        offset_row_count = batch_size * (start_batch_idx-1)
+        logging.info(f"Starting {database_name}.{table_name} at batch {start_batch_idx} with OFFSET = {offset_row_count}")
+    else:
+        start_batch_idx = 1
+        offset_row_count = 0
     
-    if exported:
-        # replace_nan(csv_path) ## ! use this to replace nan values in parallel with bcp export
-        pigz_file(csv_path)
-        csv_file = f"{table_name}_Backfill_{batch_num}.csv" if batch_num else f"{table_name}_Backfill.csv"
-        move_zip(src_tbl_dir, dst_tbl_dir, csv_file)
+    # FETCH value always remains constant ( equal to batch size ) 
+    fetch_row_count = batch_size
+    
+    for batch_num in range(start_batch_idx, num_batches+1):
+        # create logs and error files
+        bcp_log_file = create_bcp_log_file(database_name, table_name, 'output', f'BCP_Out_{database_name}_{table_name}_B{batch_num}')
+        bcp_err_file = create_bcp_log_file(database_name, table_name, 'errors', f'BCP_Err_{database_name}_{table_name}_B{batch_num}')
 
-    logging.info(f"Finished {database_name}.dbo.{table_name}")
+        # create file
+        csv_filename = f"{table_name}_Backfill_{batch_num}.csv"
+        csv_path = os.path.join(src_tbl_dir, csv_filename)
+
+        logging.info(f"Batch {batch_num}: {offset_row_count} -> {offset_row_count+fetch_row_count}")
+        bcp_query = bcp_export_batches_query(database_name, table_name, order_by, offset_row_count, fetch_row_count)
+        bcp_pigz_move(database_name, table_name, csv_path, bcp_query, bcp_log_file, bcp_err_file, src_tbl_dir, dst_tbl_dir, batch_num)
+
+        # update offset row count
+        offset_row_count += batch_size
 
 
 # - - - - - - - - - - - PIGZ - - - - - - - - - - - - -
 def pigz_file(csv_path):
+    """
+    Compress the given CSV file using PigZ.
+
+    Parameters:
+        csv_path (str): Path to the CSV file to compress.
+
+    Returns:
+        bool: True if PigZ compression is successful, False otherwise.
+    """
     logging.info(f"Running PigZ: {csv_path}")
     try:
         if os.path.exists(csv_path+'.gz'):
@@ -358,9 +357,19 @@ def pigz_file(csv_path):
         logging.error(f"Error occurred while running PigZ for {csv_path}: {e}")
         return False
 
-
 # - - - - - - - - - LOCAL > CLOUD - - - - - - - - - - -
 def move_zip(src_tbl_dir, dst_tbl_dir, csv_file):
+    """
+    Move the compressed CSV file from the source directory to the destination directory.
+
+    Parameters:
+        src_tbl_dir (str): Source directory where the CSV file is located.
+        dst_tbl_dir (str): Destination directory to move the CSV file.
+        csv_file (str): Name of the compressed CSV file.
+
+    Returns:
+        bool: True if the move operation is successful, False otherwise.
+    """
     logging.info(f"Attempting to move {csv_file+'.gz'}:")
     try:
         src_zip = os.path.join(src_tbl_dir, csv_file + ".gz")
@@ -392,15 +401,58 @@ def move_zip(src_tbl_dir, dst_tbl_dir, csv_file):
         return False
 
 
+# - - - - - - - - BCP > PIGZ > MOVE - - - - - - - - - -
+def bcp_pigz_move(database_name, table_name, csv_path, bcp_query, log_path, err_path, src_tbl_dir, dst_tbl_dir, batch_num=0):
+    """
+    Execute BCP utility to export data to a CSV file, compress the CSV using PigZ, 
+    and move the compressed file. These three tasks are grouped together in one function, 
+    and the concurrent futures module executes them for a given table before proceeding 
+    to the next task (i.e., table).
+
+    Parameters:
+        database_name (str): Name of the database.
+        table_name (str): Name of the table.
+        csv_path (str): Path to the CSV file to export.
+        bcp_query (str): BCP query to export data from the table.
+        log_path (str): Path to the BCP log file.
+        err_path (str): Path to the BCP error file.
+        src_tbl_dir (str): Source directory where the CSV file is located.
+        dst_tbl_dir (str): Destination directory to move the compressed CSV file.
+        batch_num (int, optional): Batch number if exporting data in batches. Default is 0.
+
+    Returns:
+        None
+    """
+    exported = bcp_utility_cmd(database_name, table_name, csv_path, bcp_query, log_path, err_path)
+
+    if testing_bcp_only:
+        return 
+    
+    if exported:
+        # replace_nan(csv_path) ## ! use this to replace nan values in parallel with bcp export
+        pigz_file(csv_path)
+        csv_file = f"{table_name}_Backfill_{batch_num}.csv" if batch_num else f"{table_name}_Backfill.csv"
+        move_zip(src_tbl_dir, dst_tbl_dir, csv_file)
+
+    logging.info(f"Finished {database_name}.dbo.{table_name}")
+
+
 
 # - - - - - - - - - - - RUN APP - - - - - - - - - - - - -
 def run(databases: list[tuple]):
-    for idx, database in enumerate(databases):
+    """
+    Execute the main BCP export process for a list of databases and their tables.
 
+    Parameters:
+        databases (list[tuple]): List of tuples containing the database name and a list of table names.
+
+    Returns:
+        None
+    """
+    for idx, database in enumerate(databases):
         # get the database and table names from the tuple
         database_name, table_names = database[0], database[1]
-
-        logging.info(f"Running batch {idx+1} >> {database_name}")
+        logging.info(f"Running batch {idx+1} >> {database_name}, {table_names}")
 
         # create replace connection for the server & database
         conn = pyodbc.connect('Driver={SQL Server};'
@@ -409,11 +461,12 @@ def run(databases: list[tuple]):
                             'Trusted_Connection=yes;')
         cursor = conn.cursor()
 
+        # Only run 2 batches if testing small batch parameter is set to true
         if testing_small_batch:
             for idx, table_name in enumerate(table_names):
                 src_tbl_dir = make_dir(os.path.join(data_dir, database_name, table_name))
-                dst_tbl_dir = make_dir(os.path.join(dst_dir, database_name, table_name))
-                batch_size = unique_batch_sizes.get(table_name, default_batch_size)
+                dst_tbl_dir = make_dir(os.path.join(shared_drive, database_name, table_name))
+                batch_size = custom_batch_sizes.get(table_name, default_batch_size)
                 logging.info(f"Batch size for {table_name}: {batch_size}")
                 num_batches = 2
                 order_by = get_primary_key_columns(database_name, table_name, cursor)
@@ -422,20 +475,19 @@ def run(databases: list[tuple]):
             conn.close()
             return
 
-        # Create an empty array to store "futures" tasks
-        futures = []
+        # Otherwise, run the script using concurrent futures module to run the tasks in parallel
+        futures = [] # Create an empty array to store "futures" tasks
         with concurrent.futures.ThreadPoolExecutor(max_workers=max_workers) as executor:
-
             for idx, table_name in enumerate(table_names):
                 src_tbl_dir = make_dir(os.path.join(data_dir, database_name, table_name))
-                dst_tbl_dir = make_dir(os.path.join(dst_dir, database_name, table_name))
+                dst_tbl_dir = make_dir(os.path.join(shared_drive, database_name, table_name))
 
-                batch_size = unique_batch_sizes.get(table_name, default_batch_size)
+                batch_size = custom_batch_sizes.get(table_name, default_batch_size)
                 logging.info(f"Batch size for {table_name}: {batch_size}")
 
                 # Check if approx row count available in Utils
                 row_count = available_row_counts.get(table_name)
-                if not row_count: # Otherwise, run a query  to get the row counts
+                if not row_count: # Otherwise, run a query to get the row counts
                     row_count = get_row_count(database_name, table_name, cursor)
                 
                 # Calculate the number of batches by dividing the row count by batch size (e.g., 100,000)
@@ -467,6 +519,7 @@ def run(databases: list[tuple]):
 
         cursor.close()
         conn.close()
+
 
 # - - - - - - - - EXECUTE WITH LOGGING - - - - - - - - - -
 def main():
