@@ -1,0 +1,16 @@
+Pipeline
+- Run BCP exports
+- Run pandas to replace null value
+
+1 batch = 1 mil records
+
+E.g.,
+- table with 15 mil records
+- 15 batches or 15 css
+
+Option 1:
+- BCP in parallel
+- then pandas in parallel
+
+Option 2:
+- BCP & pandas for a given batch in parallel

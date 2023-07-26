@@ -4,7 +4,7 @@ import re
 from utils import Utils
 
 ## CREATE TABLE parameters
-tbl_start_idx = 37 # What table number/index are you starting at? Add 1 to the number of tables generated in last batch(es)
+tbl_start_idx = 41 # What table number/index are you starting at? Add 1 to the number of tables generated in last batch(es)
 current_dir = os.getcwd() # Get the current working directory
 sf_database = Utils.SF_DATABASE # Name of the Snowflake database you're writing DDLs to
 source_data = f"{current_dir}/data/{sf_database}.csv" # Where to find ddl csv file
@@ -18,9 +18,9 @@ else:
 
 print(f"Testing: {testing}\n")
 if testing:
-    output_filename = f'{sf_database.upper()}_CREATE_TABLES_TEST' # Name of the SQL file that will be created in `sfsql/` subfolder
+    output_filename = f'{sf_database.upper()}_CREATE_TABLES_DEV' # Name of the SQL file that will be created in `sfsql/` subfolder
 else:
-    output_filename = f'{sf_database.upper()}_CREATE_TABLES' # Name of the SQL file that will be created in `sfsql/` subfolder
+    output_filename = f'{sf_database.upper()}_CREATE_TABLES_PROD' # Name of the SQL file that will be created in `sfsql/` subfolder
 
 ## Text you want to replace from the MSSQL output
 # Expects a list of tuples with the first string in the tuple the string to replace, and the second string as the string to replace WITH
@@ -32,6 +32,7 @@ replacements = [('','')]
 ## CREATE TABLE query generated for each table
 def create_tbl_query(idx, database_name, table_name, schema):
     drop_tbl = f"\n-- DROP TABLE IF EXISTS STG.{database_name}_{table_name.upper()}_HIST;" if testing else ''
+    truncate_tbl = f"\n-- LIST @etl.inbound/{database_name}/Backfill; STG.{database_name}_{table_name.upper()}_HIST" if testing else ''
     return f"""
 -- // TABLE {idx}: {table_name} {drop_tbl}
 CREATE TABLE IF NOT EXISTS STG.{database_name}_{table_name.upper()}_HIST ( 
@@ -42,7 +43,7 @@ CREATE TABLE IF NOT EXISTS STG.{database_name}_{table_name.upper()}_HIST (
 
 ## Additional lines added to beginning if SQL if NOT in testing mode
 def get_header():
-    return f"""USE SCHEMA {{ SF_DATABASE }}.STG;
+    return """USE SCHEMA {{ SF_DATABASE }}.STG;
 
 /*************************************************************************/
 /* Note:																 */ 
@@ -50,6 +51,9 @@ def get_header():
 /* 2. DO NOT USE MASKING POLICIES - They will be applied separately      */
 /*************************************************************************/
 """
+
+# * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
+
 
 ## Export SQL file
 def export_sql_script(query, table_name):

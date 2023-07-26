@@ -2,6 +2,21 @@ USE CREO;
 -- USE CREOArchive;
 -- USE CREOArchive2;
 
+/*
+-- Use this query for testing and exploring the data :-)
+
+SELECT 
+    * 
+    -- c.name
+    -- ,t.name
+    -- ,t.max_length
+    -- ,c.is_nullable 
+FROM sys.columns c
+JOIN sys.types t ON c.user_type_id = t.user_type_id
+WHERE c.object_id = OBJECT_ID('MessagePartV2');
+*/
+
+
 -- Create a temporary table to store the results
 DROP TABLE IF EXISTS #TableStats;
 CREATE TABLE #TableStats (
@@ -46,8 +61,8 @@ BEGIN
                 WHEN t.name = 'hierarchyid' THEN 'VARIANT'
                 WHEN t.name = 'geometry' THEN 'VARIANT'
                 WHEN t.name = 'geography' THEN 'VARIANT'
-                WHEN t.name = 'varbinary' THEN CONCAT('BINARY(', t.max_length, ')')
-                WHEN t.name = 'binary' THEN CONCAT('BINARY(', t.max_length, ')')
+                WHEN t.name = 'varbinary' THEN 'VARBINARY'
+                WHEN t.name = 'binary' THEN 'BINARY'
                 WHEN t.name = 'char' THEN CONCAT('CHAR(', t.max_length, ')')
                 WHEN t.name = 'timestamp' THEN 'TIMESTAMP'
                 WHEN t.name = 'sysname' THEN CONCAT('STRING(', t.max_length, ')')

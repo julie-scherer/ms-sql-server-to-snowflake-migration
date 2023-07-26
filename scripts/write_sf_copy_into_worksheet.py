@@ -4,14 +4,26 @@ import re
 from utils import Utils
 
 ## COPY INTO parameters
-tbl_start_idx = 37 # What table number/index are you starting at? Add 1 to the number of tables generated in last batch(es)
+batch = Utils.BATCH # List of databases and tables to run in batch (see utils.py)
+tbl_start_idx = 41 # What table number/index are you starting at? Add 1 to the number of tables generated in last batch(es)
+
 current_dir = os.getcwd() # Get the current working directory
 sf_database = Utils.SF_DATABASE # Name of the Snowflake database you're copying into
 source_data = f"{current_dir}/data/{sf_database}.csv" # Where to find ddl csv
-batch = Utils.BATCH # List of databases and tables to run in batch (see utils.py)
-aod = '2023-07-19' # asOfDate
-file_format = 'LD_CSV_PIPE_SH1_EON_GZ' # file format to use
-# file_format = 'SRC_CSV_PIPE_SH1_EON_GZ' # file format to use
+aod = '2023-07-26' # asOfDate
+
+file_format = \
+"""TYPE = CSV
+    COMPRESSION = GZIP
+    FIELD_DELIMITER = '^'
+    RECORD_DELIMITER = '\\n'
+    SKIP_HEADER = 0
+    EMPTY_FIELD_AS_NULL = TRUE """
+# file_format = 'FORMAT NAME = DEV_JS.STG.CREO_B3_BCP_CSV_ZIP_CRT_LNBRK_SH0' # file format to use
+# file_format = 'FORMAT NAME = STG.LD_CSV_PIPE_SH1_EON_GZ' # file format to use
+# file_format = 'FORMAT NAME = STG.SRC_CSV_PIPE_SH1_EON_GZ' # file format to use
+
+pattern_suffix = 'Backfill_[0-9]+\.csv\.gz'
 
 # Set the testing mode flag to True or False
 if os.getenv('TESTING') == 'True':
@@ -21,9 +33,9 @@ else:
 
 print(f"Testing? {testing}\n")
 if testing:
-    output_filename = f'{sf_database.upper()}_COPY_INTO_TEST' # Name of the SQL file that will be created in `sfsql/` subfolder
+    output_filename = f'{sf_database.upper()}_COPY_INTO_DEV' # Name of the SQL file that will be created in `sfsql/` subfolder
 else:
-    output_filename = f'{sf_database.upper()}_COPY_INTO' # Name of the SQL file that will be created in `sfsql/` subfolder
+    output_filename = f'{sf_database.upper()}_COPY_INTO_PROD' # Name of the SQL file that will be created in `sfsql/` subfolder
 
 ## Text you want to replace from the MSSQL output
 # Expects a list of tuples with the first string in the tuple the string to replace, and the second string as the string to replace WITH
@@ -33,10 +45,10 @@ replacements = [('','')]
 # * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
 
 ## COPY INTO query generated for each table
-def copy_into_tbl_query(idx, sf_database, mssql_database, table_name, columns, aod, file_format, testing=False):
+def copy_into_tbl_query(idx, sf_database, mssql_database, table_name, columns, aod, file_format, col_names_joined, index, testing=False):
     dev_wh = 'ARES' + '.' if testing else '' # use ARES or the name of your DEV_* database
     prod_wh = 'ZEUS' + '.' if testing else '' # production warehouse (where file format is stored)
-    tests = get_tests(dev_wh, mssql_database, table_name) if testing else ''    
+    tests = get_tests(dev_wh, mssql_database, table_name, col_names_joined, file_format, index) if testing else ''    
     return f"""
 -- // TABLE {idx}: {table_name}
 COPY INTO {dev_wh}STG.{sf_database}_{table_name}_HIST FROM (
@@ -46,20 +58,38 @@ COPY INTO {dev_wh}STG.{sf_database}_{table_name}_HIST FROM (
     FROM @ETL.INBOUND/{sf_database}/Backfill/{table_name}/
 )
 FILE_FORMAT = (
-    FORMAT_NAME = STG.{file_format}
+    {file_format}
 )
-PATTERN = '.*{table_name}_Backfill.csv.gz';
+PATTERN = '.*{table_name}_{pattern_suffix}';
 """ + tests
 
 ## Additional lines added to query if in testing mode
-def get_tests(dev_wh, mssql_database, table_name):
+def get_tests(dev_wh, database_name, table_name, col_names_joined, file_format, index):
     return f"""/*
-SELECT {dev_wh}ETL.COPYSELECT('STG','{mssql_database}_{table_name}_HIST',3);
-SELECT COUNT(*) AS row_count FROM {dev_wh}STG.{mssql_database}_{table_name}_HIST;
-SELECT * FROM {dev_wh}STG.{mssql_database}_{table_name}_HIST;
-[STATUS=tbd]
+-- // RUN STATUS >> [tbd]
+
+TRUNCATE TABLE IF EXISTS STG.{database_name}_{table_name.upper()}_HIST; -- drop records
+LIST @ETL.INBOUND/{sf_database}/Backfill/{table_name}/; -- list files in S3
+SELECT {dev_wh}ETL.COPYSELECT('STG','{database_name}_{table_name}_HIST',3); -- get columns in $n format
+
+SELECT COUNT(*) AS row_count FROM {dev_wh}STG.{database_name}_{table_name}_HIST; -- check row count
+SELECT TOP 10 * FROM {dev_wh}STG.{database_name}_{table_name}_HIST; -- preview data
 */
+
 """
+
+# -- // PREVIEW STAGED DATA IN S3 --
+# SELECT 
+#     -- TOP 10
+#     -- METADATA$FILE_ROW_NUMBER
+#     METADATA$FILENAME, CURRENT_TIMESTAMP(), to_date('2023-07-18'), 
+#     < insert $cols >
+#     {col_names_joined}
+# FROM @ETL.INBOUND/{sf_database}/Backfill/{table_name}/
+# (
+#     FILE_FORMAT => '{file_format}',
+#     PATTERN => '.*{table_name}_{pattern_suffix}'
+# );
 
 ## Format columns for COPY INTO query
 def format_cols_for_copy_into(columns):
@@ -118,10 +148,24 @@ def write_copy_into_snowflake():
 
             # Split the string of columns and data types into a list
             columns = re.split(r'(?<![0-9]),', raw_ddl)
+            column_names = [column.split(' ')[0] for column in columns]
+            # print(f"Column names: \n{column_names}")
+
+            col_names_joined = ', '.join(column_names)
+            # print(f"Column names joined: \n{col_names_joined}")
+
+            # Format the schema
+            fschema = re.sub(r'(?<![0-9]),', ',\n\t', raw_ddl).replace('"en-ci"',"'en-ci'").replace(' ,',',')
+
+            # Replace any strings if specified above
+            if replacements and replacements != [('','')]:
+                print("Replacements found. Working on it...")
+                for replacement in replacements:
+                    fschema = fschema.replace(replacement[0], replacement[1])
 
             # Get the COPY INTO query for the current table and add to longer text with all the queries
             fcols = format_cols_for_copy_into(columns) # get formatted columns
-            copy_into_sql = copy_into_tbl_query(table_idx, sf_database, mssql_database, table_name, fcols, aod, file_format, testing) # get copy into table syntax and insert table data
+            copy_into_sql = copy_into_tbl_query(table_idx, sf_database, mssql_database, table_name, fcols, aod, file_format, col_names_joined, index+1, testing,) # get copy into table syntax and insert table data
             copy_into_text += copy_into_sql # add this table's sql query to the copy into text with the rest of the tables queries
 
             # print(f"{table_idx}. {mssql_database}.{table_name} finished!")

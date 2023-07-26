@@ -1,0 +1,41 @@
+$tableList = 'adverse','adverse_Audit'
+
+foreach ($table in $tableList)
+{
+    Write-Host $table
+
+    $selectQuery = "select * from FHC.dbo.$table"
+    $queryOutPath = "C:\BCP\FHC\Backfill\$table\$table`_20230609.csv"
+    $mkdirPath = "C:\BCP\FHC\Backfill\$table"
+
+    Write-Host $selectQuery
+    Write-Host $queryOutPath
+
+    # Create the directory if it doesn't exist
+    if (-not (Test-Path -Path $mkdirPath -PathType Container))
+    {
+        New-Item -Path $mkdirPath -ItemType Directory | Out-Null
+    }
+
+    # SQL Server credentials
+    $server = " "
+    $database = " "
+    $username = " "
+    $password = " "
+
+    # Export data using BCP with credentials
+    & 'bcp' $selectQuery queryout $queryOutPath -S $server -d $database -U $username -P $password -c -t "`",`"" -k -r "`"\r"
+}
+
+
+-----------------------
+-c: Indicates that the data will be exported in character format.
+-t ",": Specifies the field delimiter for the exported data. In this case, a comma (",") is used as the delimiter for CSV format.
+-r "\n": Specifies the row delimiter for the exported data. In this case, a newline character ("\n") is used as the row delimiter for CSV format.
+-T: Indicates that a trusted connection will be used, which means Windows authentication will be used instead of specifying the username and password.
+
+
+
+https://learn.microsoft.com/en-us/sql/tools/bcp-utility?view=sql-server-ver16#T
+
+
