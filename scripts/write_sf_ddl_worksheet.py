@@ -1,10 +1,13 @@
 import os
 import pandas as pd
 import re
-from utils import Utils
+from imports.ddl_utils import Utils
 
 ## CREATE TABLE parameters
-tbl_start_idx = 41 # What table number/index are you starting at? Add 1 to the number of tables generated in last batch(es)
+
+batch_start_index = Utils.COUNT_TABLES_FINISHED + 1 # What table number/index are you starting at? Add 1 to the number of tables generated in last batch(es)
+print(f"Starting at {batch_start_index}")
+
 current_dir = os.getcwd() # Get the current working directory
 sf_database = Utils.SF_DATABASE # Name of the Snowflake database you're writing DDLs to
 source_data = f"{current_dir}/data/{sf_database}.csv" # Where to find ddl csv file
@@ -66,7 +69,7 @@ def export_sql_script(query, table_name):
 def write_snowflake_ddl():
     schemas_found = {}
     create_tbl_text = get_header() if not testing else ''
-    table_idx = tbl_start_idx
+    table_idx = batch_start_index
 
     for idx,db in enumerate(batch):
         batch_table_names = db[1] # second element in batch is list of column names
@@ -114,7 +117,7 @@ def write_snowflake_ddl():
             table_idx += 1
         
     # Log the number of queries generated
-    print(f"Done! Number of queries created: {table_idx - tbl_start_idx}\n")
+    print(f"Done! Number of queries created: {table_idx - batch_start_index}\n")
 
     # Write the final text with all the queries into a SQL file
     export_sql_script(create_tbl_text, output_filename)

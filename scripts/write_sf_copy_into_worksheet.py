@@ -1,11 +1,13 @@
 import os
 import pandas as pd
 import re
-from utils import Utils
+from imports.ddl_utils import Utils
 
 ## COPY INTO parameters
 batch = Utils.BATCH # List of databases and tables to run in batch (see utils.py)
-tbl_start_idx = 41 # What table number/index are you starting at? Add 1 to the number of tables generated in last batch(es)
+
+tbl_start_idx = Utils.COUNT_TABLES_FINISHED + 1 # What table number/index are you starting at? Add 1 to the number of tables generated in last batch(es)
+print(f"Starting at {tbl_start_idx}")
 
 current_dir = os.getcwd() # Get the current working directory
 sf_database = Utils.SF_DATABASE # Name of the Snowflake database you're copying into

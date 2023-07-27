@@ -1,64 +1,31 @@
 class Utils:
     
     ## Name of Snowflake database
-    # SF_DATABASE = 'SRC'
+    #  - - - - - - - - - - - - - - - - - - - - 
     SF_DATABASE = 'CREO'
-
 
     ## MSSQL database(s) and table names -- Format: ('database_name', ['column_name', 'column_name', ... ])
     #  - - - - - - - - - - - - - - - - - - - - 
-    # CREO_BATCH1 = ('CREO', ['ApprovalRequest', 'ApprovalRequestItem', 'Campaign', 'CampaignType', 'Communication', 'CommunicationMailing', 'Config', 'ConfigHistory', 'ContactType', 'Container', 'Dataset', 'DatasetColumn', 'Datasource', 'DeadMessages', 'DeadMessages2', 'DeliveryStatus', 'Emoji', 'Folder', 'FolderContact', 'FolderMessage', 'Global', 'Log', 'MessageContact', 'MessageContactType', 'MessagePart', 'MessageStatusQueue', 'MessageType', 'Package', 'Parameter', 'Rule', 'Template', 'TemplateRule', 'TemplateType', 'TempMessage', 'User', 'WebHook'])
-    # CREO_BATCH2 = ('CREO', [ 'Contact', 'DatasetCell', 'DatasetRow', 'DatasetValue', 'Message', 'MessageContactV2', 'MessageDeliveryStatus', 'MessagePartV2', 'PackageTemplate' ])
-    # CREOArchive_BATCH1 = ('CREOArchive', ['DatasetCell', 'DatasetRow', 'Message', 'MessageContactV2', 'MessageDeliveryStatus', 'MessagePartV2'])
-    # CREOArchive2_BATCH1 = ('CREOArchive2', ['DatasetCell', 'DatasetRow', 'Message', 'MessageContactV2', 'MessageDeliveryStatus', 'MessagePartV2'])
+    # done >> 
+    CREO_BATCH1 = ('CREO', ['ApprovalRequest', 'ApprovalRequestItem', 'Campaign', 'CampaignType', 'Communication', 'CommunicationMailing', 'Config', 'ConfigHistory', 'ContactType', 'Container', 'Dataset', 'DatasetColumn', 'Datasource', 'DeadMessages', 'DeadMessages2', 'DeliveryStatus', 'Emoji', 'Folder', 'FolderContact', 'FolderMessage', 'Global', 'Log', 'MessageContact', 'MessageContactType', 'MessagePart', 'MessageStatusQueue', 'MessageType', 'Package', 'Parameter', 'Rule', 'Template', 'TemplateRule', 'TemplateType', 'TempMessage', 'User', 'WebHook'])
+    # done >> 
+    CREO_BATCH2 = ('CREO', [ 'DatasetCell', 'DatasetRow', 'MessageContactV2', 'PackageTemplate' ])
+    CREO_BATCH3_1 = ('CREO', ['Contact', 'Message', 'MessageDeliveryStatus', 'MessagePartV2'] )
+    # CREO_BATCH3_2 = [ ('CREO', [ 'DatasetValue' ] ) ]
+    # CREO_BATCH4 = ('CREOArchive', ['DatasetCell', 'DatasetRow', 'Message', 'MessageContactV2', 'MessageDeliveryStatus', 'MessagePartV2'])
+    # CREO_BATCH5 = ('CREOArchive2', ['DatasetCell', 'DatasetRow', 'Message', 'MessageContactV2', 'MessageDeliveryStatus', 'MessagePartV2'])
 
     ## List of MSSQL databases/tables to run in current batch
     #  - - - - - - - - - - - - - - - - - - - - 
-    # BATCH = [ ('CREO', ['Contact', 'Message', 'MessageDeliveryStatus']) ]
-    # BATCH = [ ('CREO', ['Contact']) ]
-    # BATCH = [ ('CREO', ['MessageDeliveryStatus']) ]  #! ended at batch 754, start at 755
-    # BATCH = [ ('CREO', ['Message']) ]
+    BATCH = [ CREO_BATCH3_1 ]
 
-    # BATCH = [ ('CREO', ['Contact', 'DatasetValue', 'Message', 'MessageDeliveryStatus', 'MessagePartV2'] ) ]
-    
-    BATCH = [ ('CREO', ['DatasetValue'] ) ] ## finished at 215 on 7/26
-
-    ## (optional) Stores approx row counts for each table, to skip selecting row count in the export CSV script
-    #  - - - - - - - - - - - - - - - - - - - - 
-    ROW_COUNTS = {
-        'Contact': 22585141,
-        'DatasetValue': 795207736,
-        'Message': 15847177,
-        'MessageDeliveryStatus': 52423259,
-        'MessagePartV2': 1584766,
-    }
-
-    ## (optional) Specify optimal batch size for a given table
-    #  - - - - - - - - - - - - - - - - - - - - 
-    BATCH_SIZES = {
-        'Contact': 5000000,
-        'DatasetValue': 1500000,
-        'Message': 1000000,
-        'MessageDeliveryStatus': 2100000,
-        'MessagePartV2': 10000,
-    }
-    
-    ## (optional) Specify which batch number to start the export at for a given table
-    #  - - - - - - - - - - - - - - - - - - - - 
-    START_IDX = {
-        'DatasetValue': 216,
-    }
-
-
-
-    ## Testing
-    #  - - - - - - - - - - - - - - - - - - - - 
-    # creo_batch_test = ('CREOArchive', ['Global'])
-    # creo_batch_test = ('CREO', ['Message'])
-    # BATCH = [ creo_batch_test ]#, CREOArchive2_BATCH1 ] # todo
+    COUNT_TABLES_FINISHED = len(CREO_BATCH1[1]) + len(CREO_BATCH2[1])
 
 
     #  - - - - - - - - - - - - - - - - - - - - 
+    #  - - - - - - - - - - - - - - - - - - - - 
+    #  - - - - - - - - - - - - - - - - - - - - 
+    # SF_DATABASE = 'SRC'
     # WIN_BATCH1 = ('WINCHK', ['__CardsToDelete', '__RefactorLog', '_AARCC', '_ACHBankFor2104PostScript', '_achHistoryPresentmentXrefForConvert', '_achHistoryTransDetailVerify', '_achPendingConvert1905', '_AchPresentment1904Convert', '_achProcessingQueueConvert1905', '_achRequestConvert1905', '_AchUniquePresentment1904Convert', '_CH022850StatementFixes', '_CH035718_DOCLOST', '_CH035718_DWDOCID', '_CH039338_PendingReason', '_CH040985_CSV_Data_For_NOOA', '_CH040985_MissingEquifaxReasons', '_CollectionsDebtRecall', '_DsExclude', '_Dup_CustomerIdentificationRecords', '_FormLetterOnDemand_200103', '_formLetterOnDemand_Delete_201003', '_FormLetterPrinted_200103', '_FormLetterResult_200103', '_IN594077_RIFees', '_IN600631', '_IN600631Test', '_IssuerBankAccount', '_NextStatementFixes', '_OELoansOutOfBalance', '_RCC2022aaspeedy', '_RCC2022AdAstra', '_RCC2022AdAstraDryRun', '_RCC2022NonAdAstra', '_RCC2022NonAdAstraDryRun', '_RCC2022srconly', '_RISREPTCollectionsDebtRecall', '_ScheduledPrimaryCardManualFixes', '_tmpACHProcessingQueue', '_tmpFundingMethod', '_tmpLocationFundingMethod', '_VirginiaDateFixes', 'AACbExportDataArchive', 'ABLFacility', 'AccumConfig', 'AccumConfigHistory', 'ACH_History', 'ACH_Recv', 'ach_recv_fix', 'ACH_ReturnCode', 'ACH_ReturnCodeHistory', 'ACH_Sent', 'ACHGroup', 'ACHInterestCreditOverride', 'ACHLoanPaymentRefund', 'ACHLoanPaymentRefundStatus', 'ACHOpenEndLoanStreamInterestCredit', 'ACHPending', 'ACHProcessingQueue', 'ACHProcessingType', 'ACHQueue', 'ACHReason', 'AchRecvItem', 'ACHRequest', 'ACHSentParent', 'AchUseLegacyScheduledAchCollectionsAmtLogic', 'AdAstraWebInventory', 'AddressFormat', 'AddressRemovedReason', 'AddressStatus', 'AddressSuffix', 'AddressSuite', 'AddressType', 'AdjustmentAmountType', 'AgentAction', 'AgentResult', 'AMLAdditionalParty', 'AMLFileLog', 'AMLForeignAddress', 'AMLOccupation', 'AMLOccupationReason', 'AMLThresholdRule', 'AMLThresholdRuleTransXref', 'AMLThresholdType', 'ApiApplication', 'ApplyDueType', 'ApplyPaymentOrder', 'AreaCode', 'AspectAddOnMetricId', 'AspectAddOnMetricIdDimensionIdXref', 'AspectDimensionId', 'AspectExportJob', 'AspectExportJobAddOnMetricIdXref', 'Attorney', 'AttorneyType'])
     # WIN_BATCH2 = ('WINCHK', ['AttorneyTypeXRef', 'AuthorizedVisitorContact', 'AutoReport', 'AutoReportEditHistory', 'AutoReportEmail', 'AutoReportParameter', 'AutoReportRunSchedule', 'AutoReportSchedule', 'AutoReportTab', 'BalSheet_TransDetail', 'BalSheet2', 'BalSheetColumns2', 'Bank', 'BankAccount', 'BankClassification', 'BankClassificationType', 'BankClosed', 'BankParent', 'BankruptcyTrustee', 'BankruptcyTrusteeClaimType', 'BankStatus', 'BatchExecution', 'BillerOCRRegion', 'BillPayBiller', 'BillPayBillerStatus', 'BillPayVendor', 'BlockReason', 'BooleanQuestion', 'BooleanQuestionCompany', 'BooleanQuestionProcessType', 'BooleanQuestionResponse', 'BooleanQuestionResponseRefinanceLoanApplication', 'BumpUpReason', 'BumpUpTierType', 'BusinessEntity', 'BusinessLegalType', 'BusinessLoan', 'BusinessType', 'CABLender', 'CallCampaign', 'CallCampaignAppointment', 'CallCampaignDoNotCall', 'CallCampaignHistory', 'CallCampaignQueue', 'CallCampaignQueueActivity', 'CallCampaignQueueStatus', 'CallCampaignQueueStatusReason', 'CapsCCTXRef', 'CapsHold', 'CapsRun', 'CapsRunStatus', 'CapsSkipReason', 'CapsUpdates', 'CardBatchSettle', 'CardCoolingOff', 'CardFundingRequestType', 'CardFundingStatusCode', 'CardFundingTransaction', 'CardFundingVendor', 'CardGovernorActionType', 'CardGovernorHistory', 'CardGovernorOverrideHistory', 'CardGovernorValidation', 'CardGovernorValidationLocation', 'CardResponseType', 'CardReview', 'CardType', 'CashedCheck', 'CashedCheckImage', 'CashedCheckMICR', 'CashedCheckPayment', 'CashedCheckPaymentRefund', 'CC_Status', 'CCardResponses', 'Certificate', 'CFPB_AssumedBadAuths', 'CFPB_AssumedBadCardAuths', 'CFPB_AssumedBadLoanAuths', 'CFPB_AuthorizationGroups', 'CFPB_BadAuths', 'CFPB_BadLoans', 'CFPB_LatestAuths', 'CH029414LoanBankCardUpdateFromTransLogSnapshot', 'Channel', 'ChannelPaymentCommunicationLimit', 'CheckImageType', 'CheckPaymentType', 'CheckReturn', 'CheckType', 'chk_type', 'ClientApplication', 'ClrDataType', 'CollBonusDetail', 'CollBonusPTP', 'CollBonusTasks', 'CollectionAction', 'CollectionAgency', 'CollectionAgencyPct', 'CollectionAgingConfig', 'CollectionAgingConfigDays', 'CollectionAgingConfigDaysBackfill', 'CollectionAgingItem', 'CollectionAgingItemBackfill', 'CollectionMovement', 'CollectionNote', 'CollectionSettlement', 'CollectionSettlementReason', 'CollectionStream', 'Communication', 'CommunicationCommunicationEvent', 'CommunicationConsentConfig', 'CommunicationConsentConfigCommunicationEvent', 'CommunicationConsentConfigHistory', 'CommunicationConsentThirdPartyQueue', 'CommunicationEvent', 'CommunicationEventQueue', 'CommunicationEventQueueValue', 'CommunicationGroup', 'CommunicationGroupChannel', 'CommunicationGroupChannelVisibility', 'CommunicationLocation', 'CommunicationPreferenceOverride', 'CommunicationType', 'Company', 'CompanyBankAccount', 'CompanyBankAccountGLAcct', 'CompanyCredential', 'CompanyCredentialType', 'CompanyDetail', 'CompanyDetailHistory', 'CompanyDocument', 'CompanyExpenseType', 'CompanyHistory', 'ComponentOneReportLog', 'ConfigurableQuestion', 'ConfigurableQuestionAllowableResponse', 'ConfigurableQuestionCategory', 'ConfigurableQuestionNumericRange', 'ConfigurableQuestionSet', 'ConfigurableQuestionSetConfigurableQuestion', 'Country', 'CourtesyPayout', 'CourtesyPayoutType', 'CpiuDetail'])
     # WIN_BATCH3 = ('WINCHK', ['CpiuExceptionReport', 'CpiuMaster', 'CreditCardAttempts', 'CreditCardBlock', 'CreditCardBrand', 'CreditCardResultCode', 'CreditCardResultCodeEdit', 'CreditCardResultCodeType', 'CreditCards', 'CreditCardsEdit', 'CreditCardTrans', 'CreditCardTransRepostPayment', 'CreditCardVendor', 'CreditLimitBumpUp', 'CreditLimitBumpUpReason', 'CreditLimitOffer', 'CreditLimitOfferAudit', 'CreditLimitOfferDecline', 'CreditReportingActivity', 'CreditReportingBaseSegment', 'CreditReportingBaseSegmentHistory', 'CreditReportingBaseSegmentTag', 'CreditReportingBaseSegmentTrace', 'CreditReportingDisputeCode', 'CreditReportingDisputeResponseCode', 'CreditReportingDisputeSource', 'CreditReportingL1Segment', 'CreditReportingL1SegmentHistory', 'CreditReportingLoanActivity', 'CreditReportingLoanActivityHistory', 'CreditReportingLoanDispute', 'CreditReportingLoanDisputeNote', 'CreditReportingLoanDisputeRequest', 'CreditReportingLoanDisputeResponseDetail', 'CreditReportingLoanProductLocation', 'CreditReportingLoanProductLocationHistory', 'CreditReportingLoanStatus', 'CreditReportingLoanStatusHistory', 'CreditReportingNaturalDisaster', 'CreditReportingProcessingQueue', 'CreditReportingProcessingQueueHistory', 'CreditReportingRarrActivityXRef', 'CreditReportingRule', 'CreditReportingRuleHistory', 'CreditReportingRuleType', 'CreditReportingRun', 'CreditReportingRunStatus', 'CreditReportingStatus', 'CreditReportingTarrActivityXref', 'CreditReportingTransCodeActivityXRef', 'CreditReportingVendorConfig', 'CreditReportingVendorConfigHistory', 'CreditRptPrint', 'CreditVendor', 'CreditVendorApiHistory', 'CreditVendorData', 'CuroHelp', 'Currency', 'CurrencyExchangeConfig', 'CurrencyExchangeConfigHistory', 'CurrencyExchangeTrans', 'Customer', 'CustomerActivity', 'CustomerAddress', 'CustomerAddressEdit', 'CustomerAppDate', 'CustomerBusiness', 'CustomerCardReview', 'CustomerCoolingOff', 'CustomerCreditRpt', 'CustomerCreditRptDetail', 'CustomerEarnedCredit', 'CustomerEdit', 'CustomerEmployer', 'CustomerEmployerEdit', 'CustomerExpense', 'CustomerExpenseDetail', 'CustomerFeedback', 'CustomerFeedbackCategory', 'CustomerFeedbackResolution', 'CustomerFeedbackSource', 'CustomerFeedbackSubCategory', 'CustomerFeedbackType', 'CustomerFeedbackTypeCategoryXRef', 'CustomerFlash', 'CustomerFlashMPayRebates', 'CustomerFlashORRebates', 'CustomerFlashQuestions', 'CustomerFlashResponse', 'CustomerIdentification', 'CustomerIdentificationEdit', 'CustomerIncome', 'CustomerIncomeBackup', 'CustomerLastCreditReport', 'CustomerLead', 'CustomerLeadAction', 'CustomerLeadActivity', 'CustomerLeadInsertLoanByPhoneDenied', 'CustomerLeadLocation', 'CustomerLeadNote', 'CustomerLeadReason', 'CustomerLeadStatus', 'CustomerLeadStatusReason', 'CustomerLoanPaymentForgivenessEligible' ])
