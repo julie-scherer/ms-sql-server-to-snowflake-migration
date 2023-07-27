@@ -34,37 +34,7 @@ SELECT TOP 10 * FROM ARES.STG.CREO_Contact_HIST; -- preview data
 */
 
 
--- // TABLE 42: DatasetValue
-COPY INTO ARES.STG.CREO_DatasetValue_HIST FROM (
-    SELECT 
-        METADATA$FILENAME, CURRENT_TIMESTAMP(), to_date('2023-07-26'), 
-        ($1)::bigint, 	-- $1: DATASET_VALUE_KEY BIGINT NOT NULL
-		($2)::varchar, 	-- $2: VALUE VARCHAR(8000) NOT NULL
-		($3)::binary 	-- $3: VALUE_HASH BINARY NULL
-    FROM @ETL.INBOUND/CREO/Backfill/DatasetValue/
-)
-FILE_FORMAT = (
-    TYPE = CSV
-    COMPRESSION = GZIP
-    FIELD_DELIMITER = '^'
-    RECORD_DELIMITER = '\n'
-    SKIP_HEADER = 0
-    EMPTY_FIELD_AS_NULL = TRUE 
-)
-PATTERN = '.*DatasetValue_Backfill_[0-9]+\.csv\.gz';
-/*
--- // RUN STATUS >> [tbd]
-
-TRUNCATE TABLE IF EXISTS STG.CREO_DATASETVALUE_HIST; -- drop records
-LIST @ETL.INBOUND/CREO/Backfill/DatasetValue/; -- list files in S3
-SELECT ARES.ETL.COPYSELECT('STG','CREO_DatasetValue_HIST',3); -- get columns in $n format
-
-SELECT COUNT(*) AS row_count FROM ARES.STG.CREO_DatasetValue_HIST; -- check row count
-SELECT TOP 10 * FROM ARES.STG.CREO_DatasetValue_HIST; -- preview data
-*/
-
-
--- // TABLE 43: Message
+-- // TABLE 42: Message
 COPY INTO ARES.STG.CREO_Message_HIST FROM (
     SELECT 
         METADATA$FILENAME, CURRENT_TIMESTAMP(), to_date('2023-07-26'), 
@@ -113,7 +83,7 @@ SELECT TOP 10 * FROM ARES.STG.CREO_Message_HIST; -- preview data
 */
 
 
--- // TABLE 44: MessageDeliveryStatus
+-- // TABLE 43: MessageDeliveryStatus
 COPY INTO ARES.STG.CREO_MessageDeliveryStatus_HIST FROM (
     SELECT 
         METADATA$FILENAME, CURRENT_TIMESTAMP(), to_date('2023-07-26'), 
@@ -121,7 +91,7 @@ COPY INTO ARES.STG.CREO_MessageDeliveryStatus_HIST FROM (
 		($2)::bigint, 	-- $2: MESSAGE_KEY BIGINT NOT NULL
 		($3)::int, 	-- $3: DELIVERY_STATUS_KEY INT NOT NULL
 		to_timestamp_ntz($4), 	-- $4: DATE_ENTERED TIMESTAMP_LTZ NOT NULL
-		($5)::varchar 	-- $5: DETAIL VARCHAR(8000) NULL
+		($5)::varchar 	-- $5: DETAIL VARCHAR NULL
     FROM @ETL.INBOUND/CREO/Backfill/MessageDeliveryStatus/
 )
 FILE_FORMAT = (
@@ -145,7 +115,7 @@ SELECT TOP 10 * FROM ARES.STG.CREO_MessageDeliveryStatus_HIST; -- preview data
 */
 
 
--- // TABLE 45: MessagePartV2
+-- // TABLE 44: MessagePartV2
 COPY INTO ARES.STG.CREO_MessagePartV2_HIST FROM (
     SELECT 
         METADATA$FILENAME, CURRENT_TIMESTAMP(), to_date('2023-07-26'), 
@@ -153,8 +123,7 @@ COPY INTO ARES.STG.CREO_MessagePartV2_HIST FROM (
 		($2)::bigint, 	-- $2: MESSAGE_KEY BIGINT NULL
 		($3)::varchar, 	-- $3: CONTENT_TYPE VARCHAR(8000) NULL
 		($4)::varchar, 	-- $4: FILENAME VARCHAR(8000) NULL
-		NULL
-		-- ($5)::varbinary 	-- $5: DATA VARBINARY NULL
+		($5)::varbinary 	-- $5: DATA VARBINARY NULL
     FROM @ETL.INBOUND/CREO/Backfill/MessagePartV2/
 )
 FILE_FORMAT = (
@@ -164,6 +133,7 @@ FILE_FORMAT = (
     RECORD_DELIMITER = '\n'
     SKIP_HEADER = 0
     EMPTY_FIELD_AS_NULL = TRUE 
+    REPLACE_INVALID_CHARACTERS = TRUE -- Additional field added for this table to replace ACSII characters
 )
 PATTERN = '.*MessagePartV2_Backfill_[0-9]+\.csv\.gz';
 /*

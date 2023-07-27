@@ -23,26 +23,7 @@ FILE_FORMAT = (
 )
 PATTERN = '.*Contact_Backfill_[0-9]+\.csv\.gz';
 
--- // TABLE 42: DatasetValue
-COPY INTO STG.CREO_DatasetValue_HIST FROM (
-    SELECT 
-        METADATA$FILENAME, CURRENT_TIMESTAMP(), to_date('2023-07-26'), 
-        ($1)::bigint, 	-- $1: DATASET_VALUE_KEY BIGINT NOT NULL
-		($2)::varchar, 	-- $2: VALUE VARCHAR(8000) NOT NULL
-		($3)::binary 	-- $3: VALUE_HASH BINARY NULL
-    FROM @ETL.INBOUND/CREO/Backfill/DatasetValue/
-)
-FILE_FORMAT = (
-    TYPE = CSV
-    COMPRESSION = GZIP
-    FIELD_DELIMITER = '^'
-    RECORD_DELIMITER = '\n'
-    SKIP_HEADER = 0
-    EMPTY_FIELD_AS_NULL = TRUE 
-)
-PATTERN = '.*DatasetValue_Backfill_[0-9]+\.csv\.gz';
-
--- // TABLE 43: Message
+-- // TABLE 42: Message
 COPY INTO STG.CREO_Message_HIST FROM (
     SELECT 
         METADATA$FILENAME, CURRENT_TIMESTAMP(), to_date('2023-07-26'), 
@@ -66,7 +47,7 @@ COPY INTO STG.CREO_Message_HIST FROM (
 		to_timestamp_ntz($18), 	-- $18: SEND_AFTER TIMESTAMP_LTZ NULL
 		($19)::bigint, 	-- $19: SEND_AFTER_MESSAGE_KEY BIGINT NULL
 		($20)::boolean, 	-- $20: IS_FINISHED BOOLEAN NOT NULL
-		($21)::varchar, 	-- $21: HEADERS VARCHAR(8000) NULL
+		($21)::varchar, 	-- $21: HEADERS VARCHAR NULL
 		($22)::varchar 	-- $22: VENDOR_ID VARCHAR(8000) NULL
     FROM @ETL.INBOUND/CREO/Backfill/Message/
 )
@@ -80,7 +61,7 @@ FILE_FORMAT = (
 )
 PATTERN = '.*Message_Backfill_[0-9]+\.csv\.gz';
 
--- // TABLE 44: MessageDeliveryStatus
+-- // TABLE 43: MessageDeliveryStatus
 COPY INTO STG.CREO_MessageDeliveryStatus_HIST FROM (
     SELECT 
         METADATA$FILENAME, CURRENT_TIMESTAMP(), to_date('2023-07-26'), 
@@ -101,7 +82,7 @@ FILE_FORMAT = (
 )
 PATTERN = '.*MessageDeliveryStatus_Backfill_[0-9]+\.csv\.gz';
 
--- // TABLE 45: MessagePartV2
+-- // TABLE 44: MessagePartV2
 COPY INTO STG.CREO_MessagePartV2_HIST FROM (
     SELECT 
         METADATA$FILENAME, CURRENT_TIMESTAMP(), to_date('2023-07-26'), 
@@ -109,8 +90,7 @@ COPY INTO STG.CREO_MessagePartV2_HIST FROM (
 		($2)::bigint, 	-- $2: MESSAGE_KEY BIGINT NULL
 		($3)::varchar, 	-- $3: CONTENT_TYPE VARCHAR(8000) NULL
 		($4)::varchar, 	-- $4: FILENAME VARCHAR(8000) NULL
-        NULL
-		-- ($5)::varbinary 	-- $5: DATA VARBINARY NULL
+		($5)::varbinary 	-- $5: DATA VARBINARY NULL
     FROM @ETL.INBOUND/CREO/Backfill/MessagePartV2/
 )
 FILE_FORMAT = (
@@ -120,5 +100,6 @@ FILE_FORMAT = (
     RECORD_DELIMITER = '\n'
     SKIP_HEADER = 0
     EMPTY_FIELD_AS_NULL = TRUE 
+    REPLACE_INVALID_CHARACTERS = TRUE -- Additional field added for this table to replace ACSII characters
 )
 PATTERN = '.*MessagePartV2_Backfill_[0-9]+\.csv\.gz';
