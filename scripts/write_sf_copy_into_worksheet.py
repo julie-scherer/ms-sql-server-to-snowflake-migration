@@ -12,8 +12,8 @@ print(f"Starting at {tbl_start_idx}")
 current_dir = os.getcwd() # Get the current working directory
 sf_database = Utils.SF_DATABASE # Name of the Snowflake database you're copying into
 source_data = f"{current_dir}/data/{sf_database}.csv" # Where to find ddl csv
-aod = '2023-07-26' # asOfDate
 
+aod = '2023-07-27' # asOfDate
 file_format = \
 """TYPE = CSV
     COMPRESSION = GZIP
@@ -24,8 +24,8 @@ file_format = \
 # file_format = 'FORMAT NAME = DEV_JS.STG.CREO_B3_BCP_CSV_ZIP_CRT_LNBRK_SH0' # file format to use
 # file_format = 'FORMAT NAME = STG.LD_CSV_PIPE_SH1_EON_GZ' # file format to use
 # file_format = 'FORMAT NAME = STG.SRC_CSV_PIPE_SH1_EON_GZ' # file format to use
-
 pattern_suffix = 'Backfill_[0-9]+\.csv\.gz'
+
 
 # Set the testing mode flag to True or False
 if os.getenv('TESTING') == 'True':

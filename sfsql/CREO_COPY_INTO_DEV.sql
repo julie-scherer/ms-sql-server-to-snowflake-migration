@@ -2,7 +2,7 @@
 -- // TABLE 41: Contact
 COPY INTO ARES.STG.CREO_Contact_HIST FROM (
     SELECT 
-        METADATA$FILENAME, CURRENT_TIMESTAMP(), to_date('2023-07-26'), 
+        METADATA$FILENAME, CURRENT_TIMESTAMP(), to_date('2023-07-27'), 
         ($1)::int, 	-- $1: CONTACT_KEY INT NOT NULL
 		($2)::varchar, 	-- $2: NAME VARCHAR(8000) NULL
 		($3)::varchar, 	-- $3: ADDRESS VARCHAR(8000) NULL
@@ -37,7 +37,7 @@ SELECT TOP 10 * FROM ARES.STG.CREO_Contact_HIST; -- preview data
 -- // TABLE 42: Message
 COPY INTO ARES.STG.CREO_Message_HIST FROM (
     SELECT 
-        METADATA$FILENAME, CURRENT_TIMESTAMP(), to_date('2023-07-26'), 
+        METADATA$FILENAME, CURRENT_TIMESTAMP(), to_date('2023-07-27'), 
         ($1)::bigint, 	-- $1: MESSAGE_KEY BIGINT NOT NULL
 		($2)::varchar, 	-- $2: SUBJECT VARCHAR(8000) NULL
 		to_timestamp_ntz($3), 	-- $3: DATE_ENTERED TIMESTAMP_LTZ NOT NULL
@@ -86,7 +86,7 @@ SELECT TOP 10 * FROM ARES.STG.CREO_Message_HIST; -- preview data
 -- // TABLE 43: MessageDeliveryStatus
 COPY INTO ARES.STG.CREO_MessageDeliveryStatus_HIST FROM (
     SELECT 
-        METADATA$FILENAME, CURRENT_TIMESTAMP(), to_date('2023-07-26'), 
+        METADATA$FILENAME, CURRENT_TIMESTAMP(), to_date('2023-07-27'), 
         ($1)::bigint, 	-- $1: MESSAGE_DELIVERY_STATUS_KEY BIGINT NOT NULL
 		($2)::bigint, 	-- $2: MESSAGE_KEY BIGINT NOT NULL
 		($3)::int, 	-- $3: DELIVERY_STATUS_KEY INT NOT NULL
@@ -118,7 +118,7 @@ SELECT TOP 10 * FROM ARES.STG.CREO_MessageDeliveryStatus_HIST; -- preview data
 -- // TABLE 44: MessagePartV2
 COPY INTO ARES.STG.CREO_MessagePartV2_HIST FROM (
     SELECT 
-        METADATA$FILENAME, CURRENT_TIMESTAMP(), to_date('2023-07-26'), 
+        METADATA$FILENAME, CURRENT_TIMESTAMP(), to_date('2023-07-27'), 
         ($1)::bigint, 	-- $1: MESSAGE_PART_KEY BIGINT NOT NULL
 		($2)::bigint, 	-- $2: MESSAGE_KEY BIGINT NULL
 		($3)::varchar, 	-- $3: CONTENT_TYPE VARCHAR(8000) NULL
