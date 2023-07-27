@@ -1,31 +1,5 @@
 
--- // TABLE 41: Contact
-COPY INTO ARES.STG.CREO_Contact_HIST FROM (
-    SELECT 
-        METADATA$FILENAME, CURRENT_TIMESTAMP(), to_date('2023-07-27'), 
-        ($1)::int, 	-- $1: CONTACT_KEY INT NOT NULL
-		($2)::varchar, 	-- $2: NAME VARCHAR(8000) NULL
-		($3)::varchar, 	-- $3: ADDRESS VARCHAR(8000) NULL
-		to_timestamp_ntz($4), 	-- $4: DATE_ENTERED TIMESTAMP_LTZ NOT NULL
-		($5)::smallint, 	-- $5: CONTACT_TYPE SMALLINT NOT NULL
-		($6)::boolean, 	-- $6: IS_EXPIRED BOOLEAN NOT NULL
-		($7)::int, 	-- $7: NUM_ERRORS INT NOT NULL
-		($8)::boolean 	-- $8: IS_INVALID BOOLEAN NOT NULL
-    FROM @ETL.INBOUND/CREO/Backfill/Contact/
-)
-FILE_FORMAT = (
-    TYPE = CSV
-    COMPRESSION = GZIP
-    FIELD_DELIMITER = '^'
-    RECORD_DELIMITER = '\n'
-    SKIP_HEADER = 0
-    EMPTY_FIELD_AS_NULL = TRUE 
-    REPLACE_INVALID_CHARACTERS = TRUE -- Additional field added to this table to replace invalid ASCII characters
-)
-PATTERN = '.*Contact_Backfill_[0-9]+\.csv\.gz';
-
--- // TABLE 42: Message
--- Row Count = 13,000,000
+-- // TABLE 41: Message
 COPY INTO ARES.STG.CREO_Message_HIST FROM (
     SELECT 
         METADATA$FILENAME, CURRENT_TIMESTAMP(), to_date('2023-07-27'), 
@@ -60,12 +34,13 @@ FILE_FORMAT = (
     RECORD_DELIMITER = '\n'
     SKIP_HEADER = 0
     EMPTY_FIELD_AS_NULL = TRUE 
-    REPLACE_INVALID_CHARACTERS = TRUE -- Additional field added to this table to replace invalid ASCII characters
+    REPLACE_INVALID_CHARACTERS = TRUE -- Additional field added to this table to replace invalid characters
 )
 PATTERN = '.*Message_Backfill_[0-9]+\.csv\.gz'
 ON_ERROR = SKIP_FILE; -- Skips the following files: Message_Backfill_12.csv.gz, Message_Backfill_15.csv.gz, Message_Backfill_16.csv.gz
 
--- // TABLE 43: MessageDeliveryStatus
+
+-- // TABLE 42: MessageDeliveryStatus
 COPY INTO ARES.STG.CREO_MessageDeliveryStatus_HIST FROM (
     SELECT 
         METADATA$FILENAME, CURRENT_TIMESTAMP(), to_date('2023-07-27'), 
@@ -83,11 +58,12 @@ FILE_FORMAT = (
     RECORD_DELIMITER = '\n'
     SKIP_HEADER = 0
     EMPTY_FIELD_AS_NULL = TRUE 
-    REPLACE_INVALID_CHARACTERS = TRUE -- Additional field added to this table to replace invalid ASCII characters
+    REPLACE_INVALID_CHARACTERS = TRUE -- Additional field added to this table to replace invalid characters
 )
 PATTERN = '.*MessageDeliveryStatus_Backfill_[0-9]+\.csv\.gz';
 
--- // TABLE 44: MessagePartV2
+
+-- // TABLE 43: MessagePartV2
 COPY INTO ARES.STG.CREO_MessagePartV2_HIST FROM (
     SELECT 
         METADATA$FILENAME, CURRENT_TIMESTAMP(), to_date('2023-07-27'), 
@@ -107,4 +83,4 @@ FILE_FORMAT = (
     EMPTY_FIELD_AS_NULL = TRUE 
 )
 PATTERN = '.*MessagePartV2_Backfill_[0-9]+\.csv\.gz'
-ON_ERROR = CONTINUE;
+ON_ERROR = CONTINUE; -- Skips 56 records

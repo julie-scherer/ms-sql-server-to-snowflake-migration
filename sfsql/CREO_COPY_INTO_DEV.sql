@@ -1,42 +1,5 @@
 
--- // TABLE 41: Contact
-COPY INTO ARES.STG.CREO_Contact_HIST FROM (
-    SELECT 
-        METADATA$FILENAME, CURRENT_TIMESTAMP(), to_date('2023-07-27'), 
-        ($1)::int, 	-- $1: CONTACT_KEY INT NOT NULL
-		($2)::varchar, 	-- $2: NAME VARCHAR(8000) NULL
-		($3)::varchar, 	-- $3: ADDRESS VARCHAR(8000) NULL
-		to_timestamp_ntz($4), 	-- $4: DATE_ENTERED TIMESTAMP_LTZ NOT NULL
-		($5)::smallint, 	-- $5: CONTACT_TYPE SMALLINT NOT NULL
-		($6)::boolean, 	-- $6: IS_EXPIRED BOOLEAN NOT NULL
-		($7)::int, 	-- $7: NUM_ERRORS INT NOT NULL
-		($8)::boolean 	-- $8: IS_INVALID BOOLEAN NOT NULL
-    FROM @ETL.INBOUND/CREO/Backfill/Contact/
-)
-FILE_FORMAT = (
-    TYPE = CSV
-    COMPRESSION = GZIP
-    FIELD_DELIMITER = '^'
-    RECORD_DELIMITER = '\n'
-    SKIP_HEADER = 0
-    EMPTY_FIELD_AS_NULL = TRUE 
-    REPLACE_INVALID_CHARACTERS = TRUE -- Additional field added to this table to replace invalid ASCII characters
-)
-PATTERN = '.*Contact_Backfill_[0-9]+\.csv\.gz';
-/*
--- // RUN STATUS >> [tbd]
-
-TRUNCATE TABLE IF EXISTS STG.CREO_CONTACT_HIST; -- drop records
-LIST @ETL.INBOUND/CREO/Backfill/Contact/; -- list files in S3
-SELECT ARES.ETL.COPYSELECT('STG','CREO_Contact_HIST',3); -- get columns in $n format
-
-SELECT COUNT(*) AS row_count FROM ARES.STG.CREO_Contact_HIST; -- check row count
-SELECT TOP 10 * FROM ARES.STG.CREO_Contact_HIST; -- preview data
-*/
-
-
--- // TABLE 42: Message
--- Row Count = 13,000,000
+-- // TABLE 41: Message
 COPY INTO ARES.STG.CREO_Message_HIST FROM (
     SELECT 
         METADATA$FILENAME, CURRENT_TIMESTAMP(), to_date('2023-07-27'), 
@@ -71,23 +34,23 @@ FILE_FORMAT = (
     RECORD_DELIMITER = '\n'
     SKIP_HEADER = 0
     EMPTY_FIELD_AS_NULL = TRUE 
-    REPLACE_INVALID_CHARACTERS = TRUE -- Additional field added to this table to replace invalid ASCII characters
+    REPLACE_INVALID_CHARACTERS = TRUE -- Additional field added to this table to replace invalid characters
 )
 PATTERN = '.*Message_Backfill_[0-9]+\.csv\.gz'
 ON_ERROR = SKIP_FILE; -- Skips the following files: Message_Backfill_12.csv.gz, Message_Backfill_15.csv.gz, Message_Backfill_16.csv.gz
 /*
--- // RUN STATUS >> [tbd]
+-- // RUN STATUS >> [SUCCESS, with 3 files skipped]
 
 TRUNCATE TABLE IF EXISTS STG.CREO_MESSAGE_HIST; -- drop records
 LIST @ETL.INBOUND/CREO/Backfill/Message/; -- list files in S3
 SELECT ARES.ETL.COPYSELECT('STG','CREO_Message_HIST',3); -- get columns in $n format
 
 SELECT COUNT(*) AS row_count FROM ARES.STG.CREO_Message_HIST; -- check row count
-SELECT TOP 10 * FROM ARES.STG.CREO_Message_HIST; -- preview data
+SELECT TOP 1000 * FROM ARES.STG.CREO_Message_HIST; -- preview data
 */
 
 
--- // TABLE 43: MessageDeliveryStatus
+-- // TABLE 42: MessageDeliveryStatus
 COPY INTO ARES.STG.CREO_MessageDeliveryStatus_HIST FROM (
     SELECT 
         METADATA$FILENAME, CURRENT_TIMESTAMP(), to_date('2023-07-27'), 
@@ -105,11 +68,11 @@ FILE_FORMAT = (
     RECORD_DELIMITER = '\n'
     SKIP_HEADER = 0
     EMPTY_FIELD_AS_NULL = TRUE 
-    REPLACE_INVALID_CHARACTERS = TRUE -- Additional field added to this table to replace invalid ASCII characters
+    REPLACE_INVALID_CHARACTERS = TRUE -- Additional field added to this table to replace invalid characters
 )
 PATTERN = '.*MessageDeliveryStatus_Backfill_[0-9]+\.csv\.gz';
 /*
--- // RUN STATUS >> [tbd]
+-- // RUN STATUS >> [success !!!]
 
 TRUNCATE TABLE IF EXISTS STG.CREO_MESSAGEDELIVERYSTATUS_HIST; -- drop records
 LIST @ETL.INBOUND/CREO/Backfill/MessageDeliveryStatus/; -- list files in S3
@@ -120,7 +83,7 @@ SELECT TOP 10 * FROM ARES.STG.CREO_MessageDeliveryStatus_HIST; -- preview data
 */
 
 
--- // TABLE 44: MessagePartV2
+-- // TABLE 43: MessagePartV2
 COPY INTO ARES.STG.CREO_MessagePartV2_HIST FROM (
     SELECT 
         METADATA$FILENAME, CURRENT_TIMESTAMP(), to_date('2023-07-27'), 
@@ -140,7 +103,7 @@ FILE_FORMAT = (
     EMPTY_FIELD_AS_NULL = TRUE 
 )
 PATTERN = '.*MessagePartV2_Backfill_[0-9]+\.csv\.gz'
-ON_ERROR = CONTINUE;
+ON_ERROR = CONTINUE; -- Skips 56 records
 /*
 -- // RUN STATUS >> [tbd]
 
