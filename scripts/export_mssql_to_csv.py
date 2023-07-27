@@ -8,7 +8,7 @@ import subprocess
 import os
 import pyodbc # connect to mssql via pyodbc driver to get row count
 ## Local imports
-from imports.export_utils import Utils
+from imports.utils import Utils
 from imports.custom_bcp_sql_queries import sql_queries as csql
 
 # - - - - - - - - - SETTINGS - - - - - - - - - - -
