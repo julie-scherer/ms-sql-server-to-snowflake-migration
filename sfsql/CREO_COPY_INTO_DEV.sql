@@ -36,6 +36,7 @@ SELECT TOP 10 * FROM ARES.STG.CREO_Contact_HIST; -- preview data
 
 
 -- // TABLE 42: Message
+-- Row Count = 13,000,000
 COPY INTO ARES.STG.CREO_Message_HIST FROM (
     SELECT 
         METADATA$FILENAME, CURRENT_TIMESTAMP(), to_date('2023-07-27'), 
@@ -43,7 +44,7 @@ COPY INTO ARES.STG.CREO_Message_HIST FROM (
 		($2)::varchar, 	-- $2: SUBJECT VARCHAR(8000) NULL
 		to_timestamp_ntz($3), 	-- $3: DATE_ENTERED TIMESTAMP_LTZ NOT NULL
 		to_timestamp_ntz($4), 	-- $4: DATE_SENT TIMESTAMP_LTZ NULL
-		($5)::varchar, 	-- $5: EXCEPTION VARCHAR(8000) NULL
+		($5)::varchar, 	-- $5: EXCEPTION VARCHAR NULL
 		($6)::int, 	-- $6: CONTAINER_KEY INT NULL
 		($7)::int, 	-- $7: COMMUNICATION_MAILING_KEY INT NULL
 		($8)::int, 	-- $8: TEMPLATE_KEY INT NULL
@@ -70,8 +71,10 @@ FILE_FORMAT = (
     RECORD_DELIMITER = '\n'
     SKIP_HEADER = 0
     EMPTY_FIELD_AS_NULL = TRUE 
+    REPLACE_INVALID_CHARACTERS = TRUE -- Additional field added to this table to replace invalid ASCII characters
 )
-PATTERN = '.*Message_Backfill_[0-9]+\.csv\.gz';
+PATTERN = '.*Message_Backfill_[0-9]+\.csv\.gz'
+ON_ERROR = SKIP_FILE; -- Skips the following files: Message_Backfill_12.csv.gz, Message_Backfill_15.csv.gz, Message_Backfill_16.csv.gz
 /*
 -- // RUN STATUS >> [tbd]
 
