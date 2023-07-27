@@ -20,6 +20,7 @@ FILE_FORMAT = (
     RECORD_DELIMITER = '\n'
     SKIP_HEADER = 0
     EMPTY_FIELD_AS_NULL = TRUE 
+    REPLACE_INVALID_CHARACTERS = TRUE -- Additional field added to this table to replace invalid ASCII characters
 )
 PATTERN = '.*Contact_Backfill_[0-9]+\.csv\.gz';
 /*
@@ -101,6 +102,7 @@ FILE_FORMAT = (
     RECORD_DELIMITER = '\n'
     SKIP_HEADER = 0
     EMPTY_FIELD_AS_NULL = TRUE 
+    REPLACE_INVALID_CHARACTERS = TRUE -- Additional field added to this table to replace invalid ASCII characters
 )
 PATTERN = '.*MessageDeliveryStatus_Backfill_[0-9]+\.csv\.gz';
 /*
@@ -133,9 +135,9 @@ FILE_FORMAT = (
     RECORD_DELIMITER = '\n'
     SKIP_HEADER = 0
     EMPTY_FIELD_AS_NULL = TRUE 
-    REPLACE_INVALID_CHARACTERS = TRUE -- Additional field added for this table to replace ACSII characters
 )
-PATTERN = '.*MessagePartV2_Backfill_[0-9]+\.csv\.gz';
+PATTERN = '.*MessagePartV2_Backfill_[0-9]+\.csv\.gz'
+ON_ERROR = CONTINUE;
 /*
 -- // RUN STATUS >> [tbd]
 
