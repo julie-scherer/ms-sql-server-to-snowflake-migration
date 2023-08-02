@@ -115,9 +115,9 @@ def write_snowflake_ddl():
 
         print(f"Testing: {testing}\n")
         if testing:
-            output_filename = f'{sf_database.upper()}_CREATE_TABLES_DEV' # Name of the SQL file that will be created in `sfsql/` subfolder
+            output_filename = f'{sf_database.upper()}_DEV_CREATE_TABLES' # Name of the SQL file that will be created in `sfsql/` subfolder
         else:
-            output_filename = f'{sf_database.upper()}_CREATE_TABLES_PROD' # Name of the SQL file that will be created in `sfsql/` subfolder
+            output_filename = f'{sf_database.upper()}_PROD_CREATE_TABLES' # Name of the SQL file that will be created in `sfsql/` subfolder
 
         # Write the final text with all the queries into a SQL file
         export_sql_script(create_tbl_text, output_filename)
