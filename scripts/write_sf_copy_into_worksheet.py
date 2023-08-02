@@ -13,7 +13,7 @@ current_dir = os.getcwd() # Get the current working directory
 sf_database = Utils.SF_DATABASE # Name of the Snowflake database you're copying into
 source_data = f"{current_dir}/data/{sf_database}.csv" # Where to find ddl csv
 
-aod = '2023-08-07' # asOfDate
+aod = '2023-08-03' # asOfDate
 file_format = \
 """TYPE = CSV
     COMPRESSION = GZIP
@@ -177,9 +177,9 @@ def write_copy_into_snowflake():
         # Write the final text with all the queries into a SQL file
         print(f"Testing? {testing}\n")
         if testing:
-            output_filename = f'{mssql_database.upper()}_COPY_INTO_DEV' # Name of the SQL file that will be created in `sfsql/` subfolder
+            output_filename = f'{mssql_database.upper()}_DEV_COPY_INTO' # Name of the SQL file that will be created in `sfsql/` subfolder
         else:
-            output_filename = f'{mssql_database.upper()}_COPY_INTO_PROD' # Name of the SQL file that will be created in `sfsql/` subfolder
+            output_filename = f'{mssql_database.upper()}_PROD_COPY_INTO' # Name of the SQL file that will be created in `sfsql/` subfolder
 
         export_sql_script(copy_into_text, output_filename)
 

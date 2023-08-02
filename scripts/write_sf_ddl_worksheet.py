@@ -19,12 +19,6 @@ if os.getenv('TESTING') == 'True':
 else: 
     testing = False
 
-print(f"Testing: {testing}\n")
-if testing:
-    output_filename = f'{sf_database.upper()}_CREATE_TABLES_DEV' # Name of the SQL file that will be created in `sfsql/` subfolder
-else:
-    output_filename = f'{sf_database.upper()}_CREATE_TABLES_PROD' # Name of the SQL file that will be created in `sfsql/` subfolder
-
 ## Text you want to replace from the MSSQL output
 # Expects a list of tuples with the first string in the tuple the string to replace, and the second string as the string to replace WITH
 #   >> for example [ ('FILENAME', 'FILENAME_') ] changes 'FILENAME' to 'FILENAME_'
@@ -116,11 +110,17 @@ def write_snowflake_ddl():
             # Add 1 to the current table index
             table_idx += 1
         
-    # Log the number of queries generated
-    print(f"Done! Number of queries created: {table_idx - batch_start_index}\n")
+        # Log the number of queries generated
+        print(f"Done! Number of queries created: {table_idx - batch_start_index}\n")
 
-    # Write the final text with all the queries into a SQL file
-    export_sql_script(create_tbl_text, output_filename)
+        print(f"Testing: {testing}\n")
+        if testing:
+            output_filename = f'{sf_database.upper()}_CREATE_TABLES_DEV' # Name of the SQL file that will be created in `sfsql/` subfolder
+        else:
+            output_filename = f'{sf_database.upper()}_CREATE_TABLES_PROD' # Name of the SQL file that will be created in `sfsql/` subfolder
+
+        # Write the final text with all the queries into a SQL file
+        export_sql_script(create_tbl_text, output_filename)
 
 
 if __name__ == '__main__':
