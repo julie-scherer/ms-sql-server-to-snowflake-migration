@@ -9,7 +9,7 @@ import os
 import pyodbc # connect to mssql via pyodbc driver to get row count
 ## Local imports
 from imports.utils import Utils
-from imports.custom_bcp_sql_queries import sql_queries as csql
+from imports.custom_sql_queries import sql_queries as csql
 
 # - - - - - - - - - SETTINGS - - - - - - - - - - -
 
@@ -219,7 +219,7 @@ def bcp_export_all_query(database_name, table_name):
         # logging.info(f"Found custom BCP SQL query")
         bcp_query = custom_query
     else:
-        bcp_query = f"""SELECT * FROM {database_name}.[dbo].[{table_name}];"""
+        bcp_query = f"""SELECT * FROM {database_name}.[dbo].[{table_name}]"""
 
     logging.info(f"Query to export all records for {database_name}.dbo.{table_name}: \n{bcp_query}")
     return bcp_query
@@ -337,13 +337,18 @@ def pigz_file(csv_path):
         if os.path.exists(csv_path+'.gz'):
             logging.info(f"Found zip file in local directory, deleting existing file: {csv_path+'.gz'}")
             subprocess.call(f"del {csv_path+'.gz'}", shell=True)
-        
+
+        csv_folder = os.path.dirname(csv_path)
+        os.chdir(csv_folder)  # Change working directory to the CSV file's folder
+
+        # Use pigz with the CSV file's basename to compress only the file in the current directory
         proc = subprocess.Popen(
-            f'pigz {csv_path}'.split(maxsplit=1),
+            f'pigz {os.path.basename(csv_path)}',
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE
         )
         out, err = proc.communicate()
+
         if err != b'':
             raise ValueError(f'The following error occured while running pigZ {err}')
         

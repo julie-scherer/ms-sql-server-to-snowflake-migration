@@ -1,13 +1,13 @@
 
--- // TABLE 41: Message
-COPY INTO ARES.STG.CREO_Message_HIST FROM (
+-- // TABLE 43: Message
+COPY INTO STG.CREO_Message_HIST FROM (
     SELECT 
         METADATA$FILENAME, CURRENT_TIMESTAMP(), to_date('2023-07-27'), 
         ($1)::bigint, 	-- $1: MESSAGE_KEY BIGINT NOT NULL
 		($2)::varchar, 	-- $2: SUBJECT VARCHAR(8000) NULL
 		to_timestamp_ntz($3), 	-- $3: DATE_ENTERED TIMESTAMP_LTZ NOT NULL
 		to_timestamp_ntz($4), 	-- $4: DATE_SENT TIMESTAMP_LTZ NULL
-		($5)::varchar, 	-- $5: EXCEPTION VARCHAR NULL
+		($5)::varchar, 	-- $5: EXCEPTION VARCHAR(8000) NULL
 		($6)::int, 	-- $6: CONTAINER_KEY INT NULL
 		($7)::int, 	-- $7: COMMUNICATION_MAILING_KEY INT NULL
 		($8)::int, 	-- $8: TEMPLATE_KEY INT NULL
@@ -34,37 +34,11 @@ FILE_FORMAT = (
     RECORD_DELIMITER = '\n'
     SKIP_HEADER = 0
     EMPTY_FIELD_AS_NULL = TRUE 
-    REPLACE_INVALID_CHARACTERS = TRUE -- Additional field added to this table to replace invalid characters
 )
-PATTERN = '.*Message_Backfill_[0-9]+\.csv\.gz'
-ON_ERROR = SKIP_FILE; -- Skips the following files: Message_Backfill_12.csv.gz, Message_Backfill_15.csv.gz, Message_Backfill_16.csv.gz
+PATTERN = '.*Message_Backfill_[0-9]+\.csv\.gz';
 
-
--- // TABLE 42: MessageDeliveryStatus
-COPY INTO ARES.STG.CREO_MessageDeliveryStatus_HIST FROM (
-    SELECT 
-        METADATA$FILENAME, CURRENT_TIMESTAMP(), to_date('2023-07-27'), 
-        ($1)::bigint, 	-- $1: MESSAGE_DELIVERY_STATUS_KEY BIGINT NOT NULL
-		($2)::bigint, 	-- $2: MESSAGE_KEY BIGINT NOT NULL
-		($3)::int, 	-- $3: DELIVERY_STATUS_KEY INT NOT NULL
-		to_timestamp_ntz($4), 	-- $4: DATE_ENTERED TIMESTAMP_LTZ NOT NULL
-		($5)::varchar 	-- $5: DETAIL VARCHAR NULL
-    FROM @ETL.INBOUND/CREO/Backfill/MessageDeliveryStatus/
-)
-FILE_FORMAT = (
-    TYPE = CSV
-    COMPRESSION = GZIP
-    FIELD_DELIMITER = '^'
-    RECORD_DELIMITER = '\n'
-    SKIP_HEADER = 0
-    EMPTY_FIELD_AS_NULL = TRUE 
-    REPLACE_INVALID_CHARACTERS = TRUE -- Additional field added to this table to replace invalid characters
-)
-PATTERN = '.*MessageDeliveryStatus_Backfill_[0-9]+\.csv\.gz';
-
-
--- // TABLE 43: MessagePartV2
-COPY INTO ARES.STG.CREO_MessagePartV2_HIST FROM (
+-- // TABLE 44: MessagePartV2
+COPY INTO STG.CREO_MessagePartV2_HIST FROM (
     SELECT 
         METADATA$FILENAME, CURRENT_TIMESTAMP(), to_date('2023-07-27'), 
         ($1)::bigint, 	-- $1: MESSAGE_PART_KEY BIGINT NOT NULL
@@ -82,5 +56,4 @@ FILE_FORMAT = (
     SKIP_HEADER = 0
     EMPTY_FIELD_AS_NULL = TRUE 
 )
-PATTERN = '.*MessagePartV2_Backfill_[0-9]+\.csv\.gz'
-ON_ERROR = CONTINUE; -- Skips 56 records
+PATTERN = '.*MessagePartV2_Backfill_[0-9]+\.csv\.gz';

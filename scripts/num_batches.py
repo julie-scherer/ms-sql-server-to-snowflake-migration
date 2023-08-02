@@ -19,11 +19,14 @@ BATCH_SIZES = {
 for (kcount,vcount), (kbatch,vbatch) in zip(ROW_COUNTS.items(), BATCH_SIZES.items()):
     # BATCH_SIZES[kbatch] / ROW_COUNTS[kbatch]
     num_batches = (vcount // vbatch) + 1
-    print(f"{kcount}:"\
-          f"\n\t{vcount} approx rows"\
-          f"\n\t{vbatch} records / batch"\
-          f"\n\t= {num_batches} batches"\
-        )
+    # print(f"{kcount}:"\
+    #       f"\n\t{vcount} approx rows"\
+    #       f"\n\t{vbatch} records / batch"\
+    #       f"\n\t= {num_batches} batches"\
+    #     )
+    for batch_num in range(1, num_batches+1):
+        print(f"Batch {batch_num}\n")
+
 
 '''
 Contact: 5 batches
@@ -31,10 +34,10 @@ DatasetValue: 531
 Message: 16
 MessageDeliveryStatus: 25
 MessagePartV2: 159
+
 \\ictfs01\SharedUSA\IT\Batch\DW\BCP\CREO\MessagePartV2
 \\ictfs01\SharedUSA\IT\Batch\DW\BCP\CREO\MessageDeliveryStatus
 \\ictfs01\SharedUSA\IT\Batch\DW\BCP\CREO\Message
 \\ictfs01\SharedUSA\IT\Batch\DW\BCP\CREO\Contact
 
- 
 '''

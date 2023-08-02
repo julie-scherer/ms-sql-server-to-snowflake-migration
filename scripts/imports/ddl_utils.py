@@ -10,16 +10,18 @@ class Utils:
     CREO_BATCH1 = ('CREO', ['ApprovalRequest', 'ApprovalRequestItem', 'Campaign', 'CampaignType', 'Communication', 'CommunicationMailing', 'Config', 'ConfigHistory', 'ContactType', 'Container', 'Dataset', 'DatasetColumn', 'Datasource', 'DeadMessages', 'DeadMessages2', 'DeliveryStatus', 'Emoji', 'Folder', 'FolderContact', 'FolderMessage', 'Global', 'Log', 'MessageContact', 'MessageContactType', 'MessagePart', 'MessageStatusQueue', 'MessageType', 'Package', 'Parameter', 'Rule', 'Template', 'TemplateRule', 'TemplateType', 'TempMessage', 'User', 'WebHook'])
     # done >> 
     CREO_BATCH2 = ('CREO', [ 'DatasetCell', 'DatasetRow', 'MessageContactV2', 'PackageTemplate' ])
-    CREO_BATCH3_1 = ('CREO', ['Contact', 'Message', 'MessageDeliveryStatus', 'MessagePartV2'] )
+    CREO_BATCH3_1 = ('CREO', ['Contact', 'MessageDeliveryStatus'] )
+    CREO_BATCH3_2 = ('CREO', ['Message', 'MessagePartV2'] )
+    CREO_BATCH3_3 = ('CREO', ['DatasetRow'] )
     # CREO_BATCH3_2 = [ ('CREO', [ 'DatasetValue' ] ) ]
     # CREO_BATCH4 = ('CREOArchive', ['DatasetCell', 'DatasetRow', 'Message', 'MessageContactV2', 'MessageDeliveryStatus', 'MessagePartV2'])
     # CREO_BATCH5 = ('CREOArchive2', ['DatasetCell', 'DatasetRow', 'Message', 'MessageContactV2', 'MessageDeliveryStatus', 'MessagePartV2'])
 
     ## List of MSSQL databases/tables to run in current batch
     #  - - - - - - - - - - - - - - - - - - - - 
-    BATCH = [ CREO_BATCH3_1 ]
+    COUNT_TABLES_FINISHED = len(CREO_BATCH1[1]) + len(CREO_BATCH2[1]) + len(CREO_BATCH3_1[1])
+    BATCH = [ CREO_BATCH3_2 ]
 
-    COUNT_TABLES_FINISHED = len(CREO_BATCH1[1]) + len(CREO_BATCH2[1])
 
 
     #  - - - - - - - - - - - - - - - - - - - - 
