@@ -14,15 +14,16 @@ class Utils:
     CREO_BATCH3_2 = ('CREO', ['Message', 'MessagePartV2'] )
     CREO_BATCH3_3 = ('CREO', ['DatasetRow'] )
     # CREO_BATCH3_2 = [ ('CREO', [ 'DatasetValue' ] ) ]
-    # CREO_BATCH4 = ('CREOArchive', ['DatasetCell', 'DatasetRow', 'Message', 'MessageContactV2', 'MessageDeliveryStatus', 'MessagePartV2'])
-    # CREO_BATCH5 = ('CREOArchive2', ['DatasetCell', 'DatasetRow', 'Message', 'MessageContactV2', 'MessageDeliveryStatus', 'MessagePartV2'])
 
     ## List of MSSQL databases/tables to run in current batch
     #  - - - - - - - - - - - - - - - - - - - - 
-    COUNT_TABLES_FINISHED = len(CREO_BATCH1[1]) + len(CREO_BATCH2[1]) + len(CREO_BATCH3_1[1])
-    BATCH = [ CREO_BATCH3_2 ]
+    # COUNT_TABLES_FINISHED = len(CREO_BATCH1[1]) + len(CREO_BATCH2[1]) + len(CREO_BATCH3_1[1])
+    # BATCH = [ CREO_BATCH3_2 ]
 
-
+    CREO_BATCH4 = ('CREOArchive', ['DatasetCell', 'DatasetRow', 'Global', 'Message', 'MessageContactV2', 'MessageDeliveryStatus', 'MessagePartV2'])
+    CREO_BATCH5 = ('CREOArchive2', ['DatasetCell', 'DatasetRow', 'Message', 'MessageContactV2', 'MessageDeliveryStatus', 'MessagePartV2'])
+    COUNT_TABLES_FINISHED = 0
+    BATCH = [ CREO_BATCH4, CREO_BATCH5 ]
 
     #  - - - - - - - - - - - - - - - - - - - - 
     #  - - - - - - - - - - - - - - - - - - - - 
