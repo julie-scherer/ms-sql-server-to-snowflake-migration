@@ -1,0 +1,40 @@
+create or replace TABLE ARES.STG.CREO_CONTACT_HIST (
+    METADATAFILENAME VARCHAR(16777216) NOT NULL COLLATE 'en-ci',
+    LOADTIMESTAMP TIMESTAMP_NTZ(9) NOT NULL,
+    ASOFDATE DATE,
+    CONTACT_KEY NUMBER(38,0) NOT NULL,
+    NAME VARCHAR(8000) COLLATE 'en-ci',
+    ADDRESS VARCHAR(8000) COLLATE 'en-ci',
+    DATE_ENTERED TIMESTAMP_TZ(9) NOT NULL,
+    CONTACT_TYPE NUMBER(38,0) NOT NULL,
+    IS_EXPIRED BOOLEAN NOT NULL,
+    NUM_ERRORS NUMBER(38,0) NOT NULL,
+    IS_INVALID BOOLEAN NOT NULL
+);
+
+ 
+
+select top 10 * from ares.stg.creo_contact_hist;
+TRUNCATE TABLE  ares.stg.creo_contact_hist;
+
+ 
+
+ 
+
+select to_timestamp('6/26/2016 6:24:00 AM -05:00', 'MM/DD/YYYY HH12:MI:SS AM TZH:TZM');
+TRUNCATE TABLE ares.stg.creo_contact_hist;
+COPY INTO ares.stg.creo_contact_hist FROM 
+(
+    select METADATA$FILENAME, CURRENT_TIMESTAMP(), to_date('2023-07-28'),
+    $1,
+    $2,
+    $3,
+    to_timestamp($4, 'MM/DD/YYYY HH12:MI:SS AM TZH:TZM'),
+    $5,
+    $6,
+    $7,
+    $8
+
+FROM @ETL.INBOUND/CREO/Backfill/Contact/)
+FILE_FORMAT = ( FORMAT_NAME = ARES.STG.LD_CSV_PIPE_SH1_EON_GZ)
+pattern= '.*Contact_Backfill_.*';

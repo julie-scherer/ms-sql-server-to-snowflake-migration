@@ -1,0 +1,31 @@
+$serverName = 'rds-ue2-prod-data-read-replica-creo01.cmctpgdigwuk.us-east-2.rds.amazonaws.com'
+
+ 
+
+$delim = '|'
+
+ 
+
+# $query = "SET NOCOUNT ON ; SELECT MESSAGE_KEY, SUBJECT, DATE_ENTERED, DATE_SENT, REPLACE(REPLACE(EXCEPTION, CHAR(13), ''), CHAR(10), ''), CONTAINER_KEY, COMMUNICATION_MAILING_KEY, TEMPLATE_KEY, IS_PRODUCTION, DATASET_ROW_KEY, SERVER, MESSAGE_ID, TYPE, NUM_EXCEPTIONS, DELIVERY_STATUS_KEY, IN_REPLY_TO_MESSAGE_KEY, DIRECTION, SEND_AFTER, SEND_AFTER_MESSAGE_KEY, IS_FINISHED,REPLACE(REPLACE(HEADERS, CHAR(13), ''), CHAR(10), '') , VENDOR_ID from CREO.dbo.message  where year(cast(date_entered as date)) = 2022 and month(cast(date_entered as date))=12;"
+
+# $filePath = 'D:\BCP\CREO\Message\Message_Backfill_2022_12.csv'
+
+# (Get-Date).ToString()
+
+# invoke-sqlcmd -Server $serverName -Database CREO -Query $query | Export-csv -NoTypeInformation -Path $filePath -Delimiter $delim
+
+# (Get-Date).ToString()
+
+ 
+
+ 
+
+$query = "SET NOCOUNT ON ; SELECT MESSAGE_KEY, SUBJECT, DATE_ENTERED, DATE_SENT, REPLACE(REPLACE(EXCEPTION, CHAR(13), ''), CHAR(10), ''), CONTAINER_KEY, COMMUNICATION_MAILING_KEY, TEMPLATE_KEY, IS_PRODUCTION, DATASET_ROW_KEY, SERVER, MESSAGE_ID, TYPE, NUM_EXCEPTIONS, DELIVERY_STATUS_KEY, IN_REPLY_TO_MESSAGE_KEY, DIRECTION, SEND_AFTER, SEND_AFTER_MESSAGE_KEY, IS_FINISHED,REPLACE(REPLACE(HEADERS, CHAR(13), ''), CHAR(10), '') , VENDOR_ID from CREO.dbo.message  where year(cast(date_entered as date)) = 2022 and month(cast(date_entered as date))=11;"
+
+$filePath = 'D:\BCP\CREO\Message\Message_Backfill_2022_11.csv'
+
+(Get-Date).ToString()
+
+invoke-sqlcmd -Server $serverName -Database CREO -Query $query | Export-csv -NoTypeInformation -Path $filePath -Delimiter $delim
+
+(Get-Date).ToString()

@@ -1,0 +1,19 @@
+$serverName = 'rds-ue2-prod-data-read-replica-creo01.cmctpgdigwuk.us-east-2.rds.amazonaws.com'
+$delim = '|'
+
+# Define the total number of rows and the chunk size (number of rows per export)
+$totalRows = 1600000
+$chunkSize = 100000
+
+# Calculate the number of iterations required based on the total rows and chunk size
+$totalIterations = [math]::Ceiling($totalRows / $chunkSize)
+
+# Loop through the desired offsets to fetch data in chunks
+for ($i = 0; $i -lt $totalIterations; $i++) {
+    $offset = $i * $chunkSize
+    $query = "SET NOCOUNT ON ; SELECT * FROM CREO.[dbo].[MessagePartV2] ORDER BY MESSAGE_PART_KEY OFFSET $offset ROWS FETCH NEXT $chunkSize ROWS ONLY;"
+    $filePath = "D:\BCP\CREO\MessagePartV2\MessagePartV2_Backfill_$($i+1).csv"
+    (Get-Date).ToString()
+    invoke-sqlcmd -Server $serverName -Database CREO -Query $query | Export-csv -NoTypeInformation -Path $filePath -Delimiter $delim
+    (Get-Date).ToString()
+}
