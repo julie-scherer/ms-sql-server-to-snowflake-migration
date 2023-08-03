@@ -1,7 +1,7 @@
 import os
 import pandas as pd
 import re
-from imports.ddl_utils import Utils
+from ddl_utils import Utils
 
 ## CREATE TABLE parameters
 

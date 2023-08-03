@@ -1,7 +1,7 @@
 import os
 import pandas as pd
 import re
-from imports.ddl_utils import Utils
+from ddl_utils import Utils
 
 ## COPY INTO parameters
 batch = Utils.BATCH # List of databases and tables to run in batch (see utils.py)
@@ -17,12 +17,11 @@ aod = '2023-08-03' # asOfDate
 file_format = \
 """TYPE = CSV
     COMPRESSION = GZIP
-    FIELD_DELIMITER = '|'
+    FIELD_DELIMITER = '^'
     RECORD_DELIMITER = '\\n'
-    SKIP_HEADER = 1
-    REPLACE_INVALID_CHARACTERS = TRUE
+    SKIP_HEADER = 0
     NULL_IF = 'NULL'
-"""
+    REPLACE_INVALID_CHARACTERS = TRUE"""
 # file_format = 'FORMAT NAME = DEV_JS.STG.CREO_B3_BCP_CSV_ZIP_CRT_LNBRK_SH0' # file format to use
 # file_format = 'FORMAT NAME = STG.LD_CSV_PIPE_SH1_EON_GZ' # file format to use
 # file_format = 'FORMAT NAME = STG.SRC_CSV_PIPE_SH1_EON_GZ' # file format to use
