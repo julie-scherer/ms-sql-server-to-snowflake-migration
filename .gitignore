@@ -3,5 +3,3 @@ __pycache__
 .env
 .DS_Store
 csvs/*
-logs/*
-_archive
