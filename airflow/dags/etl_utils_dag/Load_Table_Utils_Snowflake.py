@@ -12,28 +12,8 @@ from airflow.operators.dummy_operator import DummyOperator
 from airflow.providers.snowflake.hooks.snowflake import SnowflakeHook
 from airflow.providers.microsoft.mssql.hooks.mssql import MsSqlHook
 from airflow.models import Variable
-
 from include.functions import ms_teams_callback_functions
 
-author = 'Julie Scherer'
-
-## Global variables 
-SNOWFLAKE_DATABASE = 'ARES'
-SNOWFLAKE_SCHEMA = 'ETL'
-MSSQL_DATABASE = 'CREO'
-S3_BUCKET_NAME = Variable.get("s3_etldata_bucket_var") #s3-dev-etldata-001
-FILE_FORMAT = """
-	TYPE = CSV
-	FIELD_DELIMITER = '|'
-	RECORD_DELIMITER = '\\n'
-	SKIP_HEADER = 1
-	NULL_IF = 'NULL'
-"""
-START_DATE = pendulum.datetime(2023, 7, 1, tz='US/Eastern')
-TABLE_NAME = f"{SNOWFLAKE_DATABASE}.{SNOWFLAKE_SCHEMA}.{MSSQL_DATABASE}_UTILS_TEST"
-LOCAL_OUT_DIR = f"include/UTILS/{SNOWFLAKE_DATABASE}/{SNOWFLAKE_SCHEMA}"
-CSV_FILE_NAME = f"{MSSQL_DATABASE}_UTILS_TEST.csv"
-S3_PATH = F"{MSSQL_DATABASE}/UTILS"
 
 fullTableList = {
 	"CREO_APPROVALREQUEST_HIST": {
@@ -308,6 +288,28 @@ fullTableList = {
 	}
 }
 
+
+# - - - - - - - - - - 
+
+author = 'Julie Scherer'
+
+## Global variables 
+SNOWFLAKE_DATABASE = 'ARES'
+SNOWFLAKE_SCHEMA = 'ETL'
+MSSQL_DATABASE = 'CREO'
+S3_BUCKET_NAME = Variable.get("s3_etldata_bucket_var") #s3-dev-etldata-001
+FILE_FORMAT = """
+	TYPE = CSV
+	FIELD_DELIMITER = '|'
+	RECORD_DELIMITER = '\\n'
+	SKIP_HEADER = 1
+	NULL_IF = 'NULL'
+"""
+START_DATE = pendulum.datetime(2023, 7, 1, tz='US/Eastern')
+TABLE_NAME = f"{SNOWFLAKE_DATABASE}.{SNOWFLAKE_SCHEMA}.{MSSQL_DATABASE}_UTILS_TEST"
+LOCAL_OUT_DIR = f"include/UTILS/{SNOWFLAKE_DATABASE}/{SNOWFLAKE_SCHEMA}"
+CSV_FILE_NAME = f"{MSSQL_DATABASE}_UTILS_TEST.csv"
+S3_PATH = F"{MSSQL_DATABASE}/UTILS"
 
 # - - - - - - - - - - 
 
