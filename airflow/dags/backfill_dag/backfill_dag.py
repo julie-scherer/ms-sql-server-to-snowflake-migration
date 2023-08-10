@@ -1,231 +1,360 @@
-import os
-import logging
+"""
+### Load CREO data to Snowflake 
+Scheduled to run every morning at 6AM EST
+This DAG copies data for the below listed tables based on table type (increamental, full-load) to Snowflake.
+
+Nomenclature Cheat Sheet:
+- Variables that are in ALL CAPS are global variables defined at the beginning of the script
+
+- Directories = folder location
+- Filename = name of a file
+- Path = full path to a file, with the file name included
+"""
+import math
 import re
+import time
+import logging
 from datetime import datetime, timedelta
-# import connectorx as cx  ##//connectorx==0.3.2a2
 import pendulum
-import pandas as pd
+import numpy as np
 
-from airflow import DAG
-from airflow.models import Variable
 from airflow.decorators import dag, task
+from airflow.models import Variable
 from airflow.operators.dummy_operator import DummyOperator
-from airflow.operators.python_operator import PythonOperator
-from airflow.providers.snowflake.operators.snowflake import SnowflakeOperator
-from airflow.providers.snowflake.hooks.snowflake import SnowflakeHook
-from airflow.providers.microsoft.mssql.operators.mssql import MsSqlOperator
-from airflow.providers.microsoft.mssql.hooks.mssql import MsSqlHook
-from airflow.providers.amazon.aws.hooks.s3 import S3Hook
 from airflow.utils.task_group import TaskGroup
-
-from astro import sql as aql
+from airflow.providers.amazon.aws.hooks.s3 import S3Hook
+from airflow.providers.microsoft.mssql.hooks.mssql import MsSqlHook
+from airflow.providers.snowflake.hooks.snowflake import SnowflakeHook
 
 from include.functions import ms_teams_callback_functions
-import include.sql.backfill_sql_statements as sql_stmts
 
-datestamp = '2023-07-27'
+# - - - - - - - - - SETTINGS - - - - - - - - -
 
-## Global variables 
-# >> Defined in upper case to distinguish from locally defined variables
-DATABASE_NAME = 'CREO'
-TABLE_NAMES = ['Contact']
+
+author = 'Julie Scherer'
+
+SNOWFLAKE_DATABASE = 'ARES'
+SNOWFLAKE_SCHEMA = 'STG'
+MSSQL_DATABASE = 'CREO'
+TABLE_LIST = ['DatasetValue']
+# TABLE_LIST = ['Message']
+
+# MSSQL_DATABASE = 'CREOArchive'
+# TABLE_LIST = ['DatasetCell', 'DatasetRow', 'Global', 'Message', 'MessageContactV2', 'MessageDeliveryStatus', 'MessagePartV2']
+
+# MSSQL_DATABASE = 'CREOArchive2'
+# TABLE_LIST = ['DatasetCell', 'DatasetRow', 'Message', 'MessageContactV2', 'MessageDeliveryStatus', 'MessagePartV2']
+
+DELIMITER = '|'
 FILE_FORMAT = \
-"""TYPE = CSV
-    COMPRESSION = GZIP
-    FIELD_DELIMITER = '|'
+f"""TYPE = CSV
+    COMPRESSION = AUTO
+    FIELD_DELIMITER = '{DELIMITER}'
     RECORD_DELIMITER = '\\n'
     SKIP_HEADER = 0
 """
-PATTERN = 'Backfill_[0-9]+\.csv\.gz'
 
-START_DATE = pendulum.datetime(2023, 7, 1, tz='US/Eastern')
+# Define the batch size for processing data in chunks
+BATCH_SIZE = 1000
 
-MSSQL_CONN = "awsmssql_creosql_creo_conn"
-MSSQL_HOOK = MsSqlHook(mssql_conn_id=MSSQL_CONN)
+# - - - - - - CONNECTIONS & HOOKS - - - - - - -
 
-SF_CONN = "snowflake_default"
-SF_HOOK = SnowflakeHook(snowflake_conn_id=SF_CONN)
+def get_mssql_hook():
+	"""
+	Returns a MSSQL hook for interacting with MSSQL.
+	"""
+	MSSQL_CONN = "awsmssql_creosql_creo_conn"
+	# MSSQL_CONN = mssql_connection_params["conn_id"]
+	MSSQL_HOOK = MsSqlHook(mssql_conn_id=MSSQL_CONN)
+	return MSSQL_HOOK
 
-S3_CONN = "aws_s3_conn"
-S3_BUCKET = "s3_etldata_bucket_var" 
-# S3_BUCKET = Variable.get("s3_etldata_bucket_var") #! use in prod, comment out in local testing
-S3_HOOK = S3Hook(aws_conn_id=S3_CONN)
+def get_s3_hook():
+	"""
+	Returns a S3 hook for interacting with S3.
+	"""
+	S3_CONN = "aws_s3_conn"
+	S3_HOOK = S3Hook(aws_conn_id=S3_CONN)
+	return S3_HOOK
 
-# - - - - - - - - - - - - - - - - - - - -
+def get_sf_hook():
+	"""
+	Returns a Snowflake hook for interacting with Snowflake.
+	"""
+	SF_CONN = "snowflake_default"
+	SF_HOOK = SnowflakeHook(snowflake_conn_id=SF_CONN)
+	return SF_HOOK
 
-# Default DAG args
+# - - - - - - - - STAGING DAG - - - - - - - - -
+
+def get_table_definitions(mssql_table_name):
+	sql_query = f"""
+	SELECT Column_Data FROM ETL.{MSSQL_DATABASE}_DDL
+	WHERE Table_Name = '{mssql_table_name}'
+	"""
+	# ddl = get_sf_hook().get_records(sql_query)
+	ddl = get_sf_hook().get_first(sql_query)
+	col_data = ddl.get('COLUMN_DATA')
+	return col_data
+
+def format_copy_into_columns(col_data):
+	pretty_col_data = col_data.replace('"en-ci"',"'en-ci'").replace('"','')
+	col_list = re.split(r'(?<![0-9]),', pretty_col_data)
+
+	formatted_columns = []
+	for index, column in enumerate(col_list, start=1):
+		column_data = column.strip().split(' ') # remove any trailing white spaces on the left or right ends of the string, and then split the string into a list
+		col_name, col_type = column_data[0], column_data[1]
+
+		cast = re.sub(r'[^a-zA-Z_]', '', col_type).lower() # remove any characters that are not a letter or underscore, and turns to lowercase
+		cmt = f"\t-- ${index}: {col_name} {col_type} {'NOT NULL' if 'NOT' in column_data else 'NULL'}" # comment to add at end of line
+		
+		formatted_col = f"(${index})::{cast}" if cast != 'timestamp_ltz' else f"to_timestamp_ntz(${index})" # cast the column to the correct data type
+		formatted_col += f', {cmt}' if (index < len(col_list)) else f' {cmt}' # add comment with a preceeding comma, except if its the last column, then don't add a comma
+
+		formatted_columns.append(formatted_col) # Append the single formatted column to the list
+
+	return '\n'.join(formatted_columns)  # Join multiple formatted columns in the list with a newline and 2 tabs for formatting
+
+def format_ddl_schema(col_data):
+	col_data = col_data.replace('"en-ci"',"'en-ci'").replace(' ,',',').replace('"','')
+	col_data = re.sub(r'(?<![0-9]),', ',\n\t', col_data)
+	return col_data
+
+# Run MSSQL query to get Primary Key Column
+def get_primary_key(mssql_table_name):
+	# Get the primary key column(s) of the table to order by
+	query = f"""
+	SELECT COLUMN_NAME
+	FROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE
+	WHERE OBJECTPROPERTY(OBJECT_ID(CONSTRAINT_SCHEMA + '.' + QUOTENAME(CONSTRAINT_NAME)), 'IsPrimaryKey') = 1
+	AND TABLE_CATALOG = '{MSSQL_DATABASE}' AND TABLE_SCHEMA = 'dbo' AND TABLE_NAME = '{mssql_table_name}';
+	"""
+	df = get_mssql_hook().get_pandas_df(query)
+	primary_key = df.iloc[0,0]
+	return primary_key
+
+def get_row_count(mssql_table_name):
+	# Get the total count of rows in the MSSQL table
+	# query = f"SELECT COUNT(*) FROM [dbo].[{mssql_table_name}]"
+	query = f"""
+	SELECT p.rows AS [RowCount]
+	FROM sys.tables t
+	JOIN sys.partitions p ON t.object_id = p.object_id
+	WHERE p.index_id IN (0, 1)
+	AND t.name = '{mssql_table_name}';
+	"""
+	df = get_mssql_hook().get_pandas_df(query)
+	total_rows = df.iloc[0,0]
+	return total_rows
+
+# - - - - - - - - BACKFILL DAG - - - - - - - - -
+
+## Default DAG args
 default_args = {
-    "retries": 0,
-    "retry_delay": timedelta(minutes=1),
-    'execution_timeout': timedelta(hours=3),
-    "on_failure_callback": ms_teams_callback_functions.failure_callback
+	'owner': author,
+	"retries": 0,
+	"retry_delay": timedelta(minutes=1),
+	'execution_timeout': timedelta(hours=3),
+	"on_failure_callback": ms_teams_callback_functions.failure_callback
 }
 
-# Initialize the DAG
+## Initialize the DAG
 @dag(
-    "Backfill_DAG",
-    start_date=START_DATE,
-    catchup=False,
-    schedule_interval='0 6 * * *',  # 6AM EST
-    dagrun_timeout=timedelta(hours=4),
-    doc_md=__doc__,
-    default_args=default_args
+	"Backfill_DAG",
+	start_date=pendulum.datetime(2023, 7, 1, tz='US/Eastern'),
+	catchup=False,
+	schedule='@once',  # 6AM EST
+	dagrun_timeout=timedelta(hours=4),
+	doc_md=__doc__,
+	template_searchpath=f"include/sql/Staging_{MSSQL_DATABASE}/",
+	default_args=default_args
 )
-def backfill_dag():
-    start = DummyOperator(task_id="start") 
-    end = DummyOperator(task_id="end", trigger_rule="all_done")
-    aod = datetime.strptime(datestamp, "%Y-%m-%d") #// datestamp input in YYYY-MM-DD format
-    
-    ## Get MSSQL table definitions by running SQL query in SQL statements
-    @task
-    def get_mssql_table_definitions(database_name, table_name):
-        df = MSSQL_HOOK.get_pandas_df(sql_stmts.get_table_definitions)
-        print(df)
+def Backfill_DAG():
 
-        ddl_df = pd.read_csv(f'include/{database_name.upper()}.csv')
+	@task(multiple_outputs=True)
+	def get_runtime_params(mssql_table_name) -> dict:
+		sf_table_name = f'{MSSQL_DATABASE}_{mssql_table_name}_HIST'
 
-        table_row = ddl_df.loc[ddl_df['TableName'] == table_name]
-        table_definitions = table_row['ColumnData'].iloc[0]
+		col_data = get_table_definitions(mssql_table_name)
+		fschema = format_ddl_schema(col_data)
+		logging.info(f"Formatted schema for creating {mssql_table_name} table: \n{fschema}")
+		columns = format_copy_into_columns(col_data)
+		logging.info(f"Formatted columns for loading staged data into {mssql_table_name}: \n{columns}")
 
-        logging.info(f"Successfully retrieved table definitions for {database_name} {table_name}.")
-        return table_definitions
+		# columns = get_table_definitions(mssql_table_name)
+		# logging.info(f"Formatted columns for loading staged {mssql_table_name} data: \n{columns}")
 
-    ## Transform table definitions from MSSQL to be used in Snowflake
-    @task
-    def transform_mssql_ddl(table_definitions):
-        schema = re.sub(r'(?<![0-9]),', ',\n\t', table_definitions).replace('"en-ci"',"'en-ci'").replace(' ,',',')
-        return schema
+		primary_key = get_primary_key(mssql_table_name)
+		logging.info(f"Primary key: {primary_key}")
+		
+		row_count = get_row_count(mssql_table_name)
+		logging.info(f"Number of rows: {row_count}")
 
-    ## Format columns for COPY INTO query
-    @task
-    def format_cols_for_copy_into(table_definitions):
-        columns = re.split(r'(?<![0-9]),', table_definitions)
-        formatted_columns = []
-        for index, column in enumerate(columns, start=1):
-            column_data = column.strip().split(' ') # remove any trailing white spaces on the left or right ends of the string, and then split the string into a list
-            col_name, col_type = column_data[0], column_data[1]
+		num_iterations = math.ceil(row_count / BATCH_SIZE)
+		logging.info(f"Number of iterations: {num_iterations}")
 
-            cast = re.sub(r'[^a-zA-Z_]', '', col_type).lower() # remove any characters that are not a letter or underscore, and turns to lowercase
-            cmt = f"\t-- ${index}: {col_name} {col_type} {'NOT NULL' if 'NOT' in column_data else 'NULL'}" # comment to add at end of line
-            
-            formatted_col = f"(${index})::{cast}" if cast != 'timestamp_ltz' else f"to_timestamp_ntz(${index})" # cast the column to the correct data type
-            formatted_col += f', {cmt}' if (index < len(columns)) else f' {cmt}' # add comment with a preceeding comma, except if its the last column, then don't add a comma
+		aod = datetime.strftime(datetime.now(), "%Y-%m-%d")
+		
+		s3_bucket_name = Variable.get("s3_etldata_bucket_var") #s3-dev-etldata-001
+		s3_dir_path = f"{MSSQL_DATABASE}/Backfill/TEST/{mssql_table_name}"
+		
+		file_name = f"{mssql_table_name}_Backfill_Test"
+		# csv_file_name = f"{mssql_table_name}_Backfill.csv"
+		# zip_file_name = csv_file_name + '.gz'
 
-            formatted_columns.append(formatted_col) # Append the single formatted column to the list
+		runtime_params = {
+			"columns": columns,
+			"fschema": fschema,
+			"primary_key": primary_key,
+			"row_count": row_count,
+			"num_iterations": num_iterations,
+			"sf_table_name": sf_table_name,
+			"mssql_table_name": mssql_table_name,
+			"aod": aod,
+			"s3_bucket_name": s3_bucket_name,
+			"s3_dir_path": s3_dir_path,
+			"file_name": file_name,
+			# "csv_file_name": csv_file_name,
+			# "zip_file_name": zip_file_name,
+		}
 
-        return '\n\t\t'.join(formatted_columns)  # Join multiple formatted columns in the list with a newline and 2 tabs for formatting
+		return runtime_params
+	
+	@task
+	def create_sf_table(runtime_params):
+		sf_table_name = runtime_params.get("sf_table_name")
+		fschema = runtime_params.get("fschema")
+		create_table = f"""
+		CREATE TABLE IF NOT EXISTS STG.{sf_table_name} ( 
+		METADATAFILENAME VARCHAR(16777216) NOT NULL COLLATE 'en-ci', LOADTIMESTAMP TIMESTAMP_NTZ(9) NOT NULL, ASOFDATE DATE,
+		{fschema}
+		);
+		"""
+		logging.info(f'CREATE TABLE: \n\n{create_table}')
+		get_sf_hook().run(create_table)
 
-    ## Create Snowflake table
-    @task
-    def create_snowflake_table(database_name, table_name, schema):
-        return SnowflakeOperator(
-            task_id=f"create_{database_name.lower()}_{table_name.lower()}_table",
-            sql=sql_stmts.create_snowflake_table,
-            params={
-                "database_name": database_name.upper(),
-                "table_name": table_name.upper(),
-                "schema": schema,
-                }
-            )
+	# @task
+	def mssql_to_s3(runtime_params, offset, batch):
+		"""
+		Loads the ZIP file obtained from the previous task to the specified S3 bucket.
+		"""
+		primary_key = runtime_params.get("primary_key")
 
-    def get_primary_key_columns(database_name, table_name):
-        # Execute the query and get the primary key column(s)
-        result = MSSQL_HOOK.get_records(sql_stmts.get_primary_key_columns, parameters={"database_name": database_name, "table_name": table_name})
-        primary_key_columns = [row[0] for row in result]  # Fetch all rows and extract the first column
-        order_by = ', '.join(primary_key_columns) # Build the ORDER BY clause based on the primary key column(s)
-        return order_by # Return the primary key column(s) as a list of column names
+		mssql_table_name = runtime_params.get("mssql_table_name")
+		s3_bucket_name = runtime_params.get("s3_bucket_name")
+		s3_dir_path = runtime_params.get("s3_dir_path")
+		
 
-    ## Load CSVs to S3
-    @task
-    def csv_to_s3(database_name, table_name, batch_size=1000000):
-        s3_path = f"inbound/{database_name}/Backfill/{table_name}"
-        offset = 0
-        batch_number = 1
+		logging.info(f'Exporting {mssql_table_name} from MSSQL')
+		mssql_query = f"""
+		SELECT * FROM [dbo].[{mssql_table_name}]
+		ORDER BY {primary_key}
+		OFFSET {offset} ROWS
+		FETCH NEXT {BATCH_SIZE} ROWS ONLY;
+		"""
+		df = get_mssql_hook().get_pandas_df(sql=mssql_query)
+		logging.info(f'MSSQL Query: \n\n{mssql_query}')
+		
+		if df.empty:
+			logging.info(f'No results found')
+			pass
+		else:
+			logging.info(f'Writing {mssql_table_name} in CSV format')
+			df_byte = df\
+				.to_csv(
+					compression='gzip',  # Compress the CSV file using gzip
+					sep=f'{DELIMITER}',  # Use the pipe symbol as the column separator
+					index=False,  # Exclude the row index from the CSV
+					na_rep='NULL',  # Replace missing values with 'NULL'
+					header=False,  # Exclude the column headers from the CSV
+					doublequote=True,  # Enable double quoting for values
+					quotechar='"',
+				)\
+				.encode()
+			# .replace({np.nan:'NULL'})\
 
-        order_by = get_primary_key_columns(database_name, table_name)
-        while True:
-            # Read data from MSSQL in batches
-            query = f"SELECT * FROM {table_name} ORDER BY {order_by} OFFSET {offset} ROWS FETCH NEXT {batch_size} ROWS ONLY"
-            df = MSSQL_HOOK.get_pandas_df(query)
-            logging.info(f"Running {query}: \n{df.head()}")
+			# Load zip file to S3
+			# zip_file_name = runtime_params.get("zip_file_name")
+			file_name = runtime_params.get("file_name")
+			zip_file_name = f"{file_name}_{batch}.csv.gz" #file_name + str(batch) + '.csv.gz'
+			logging.info(f'Loading {zip_file_name} to S3')
+			get_s3_hook().load_bytes(
+				bytes_data=df_byte,
+				bucket_name=s3_bucket_name,
+				key=f"inbound/{s3_dir_path}/{zip_file_name}",
+				replace=True,
+			)
+		
+		return df
 
-            # If there is no more data to read, break the loop
-            if df.empty:
-                logging.info(f"No data to read, breaking from export csv and load to s3 task")
-                break
+	# @task
+	def s3_to_snowflake(runtime_params, batch):
+		sf_table_name = runtime_params.get("sf_table_name")
+		columns = runtime_params.get("columns")
+		aod = runtime_params.get("aod")
+		
+		s3_bucket_name = runtime_params.get("s3_bucket_name")
+		s3_dir_path = runtime_params.get("s3_dir_path")
 
-            # Convert the batch DataFrame to CSV bytes
-            df_byte = df.to_csv(
-                header=False,  # Exclude the column headers from the CSV
-                index=False,  # Exclude the row index from the CSV
-                sep="|",  # Use the pipe symbol as the column separator
-                na_rep='NULL',  # Replace missing values with 'NULL'
-                compression='gzip',  # Compress the CSV file using gzip
-                doublequote=True,  # Enable double quoting for values
-                quotechar='"'
-            ).encode()
-            logging.info(f"Successfully converted dataframe to CSV")
+		# zip_file_name = runtime_params.get("zip_file_name")
+		file_name = runtime_params.get("file_name")
+		zip_file_name = f"{file_name}_{batch}.csv.gz"
+		load_staged_data = f"""
+		-- \\ {sf_table_name}
+		COPY INTO STG.{sf_table_name} 
+		FROM (
+		SELECT 
+			METADATA$FILENAME, CURRENT_TIMESTAMP(), to_date('{aod}'), 
+			{columns} 
+		FROM @ETL.INBOUND/{s3_dir_path}/
+		)
+		FILE_FORMAT = ( 
+			{FILE_FORMAT}
+		) 
+		PATTERN = '.*{zip_file_name}.*'
+		"""
+		logging.info(f'COPY INTO: \n\n{load_staged_data}')
+		get_sf_hook().run(load_staged_data)
 
-            # Load the CSV bytes to S3
-            s3_file = f"{table_name}_Backfill_{batch_number}.csv.gz"
-            S3_HOOK.load_bytes(
-                bytes_data=df_byte,
-                bucket_name=S3_BUCKET,
-                replace=True,
-                key=f"{s3_path}/{s3_file}"
-            )
-            logging.info(f"Successfully loaded CSV to S3: {s3_file}")
 
-            # Update offset and batch number for the next batch
-            offset += batch_size
-            batch_number += 1
+	@task
+	def run_backfill_pipeline(runtime_params):
+		mssql_table_name = runtime_params.get("mssql_table_name")
+		logging.info(f"Running backfill for {mssql_table_name}")
+		num_iterations = runtime_params.get("num_iterations")
+		for i in range(num_iterations):
+			# Start timer
+			start = time.time()
+			
+			offset = i * BATCH_SIZE
+			
+			mssql_to_s3_task = mssql_to_s3(runtime_params, offset, i+1)
+			s3_to_snowflake_task = s3_to_snowflake(runtime_params, i+1)
 
-            logging.info(f"Successfully loaded {database_name} {table_name} batch {batch_number} ({offset - batch_size} - {offset}) to {s3_path}/{s3_file}")
+			mssql_to_s3_task
+			s3_to_snowflake_task
 
-    ## Copy staged data into Snowflake
-    @task
-    def s3_to_snowflake(database_name, table_name, aod, columns):
-        file_format = FILE_FORMAT
-        pattern = PATTERN
-        return SnowflakeOperator(
-            task_id=f"load_staged_data_{database_name.lower()}_{table_name.lower()}",
-            sql=sql_stmts.load_staged_data,
-            params={
-                "database_name": database_name,
-                "table_name": table_name,
-                "columns": columns,
-                "aod": aod,
-                "file_format": file_format,
-                "pattern": pattern,
-            }
-        )
+			# Log end time
+			end = time.time()
+			exec_time = end - start 
+			logging.info(f"Total time to execute backfill for batch {i+1}: {exec_time}")
+		
+	# - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 
-    # - - - - - - - - - - - - - - - - - - - -
-    # Initialize an empty list to hold the tasks
-    backfill_task_group = []
-    database_name = DATABASE_NAME
-    table_names = TABLE_NAMES
-    for idx, table_name in enumerate(table_names):
-        table_definitions = get_mssql_table_definitions(database_name, table_name)
+	start = DummyOperator(task_id="start")
+	end = DummyOperator(task_id="end", trigger_rule="all_done")
+	
+	for mssql_table_name in TABLE_LIST: 
+		with TaskGroup(group_id=f"{mssql_table_name}_Task") as backfill_table:
+			
+			runtime_params = get_runtime_params(mssql_table_name)
+			runtime_params
 
-        schema = transform_mssql_ddl(table_definitions)
-        create_snowflake_table_task = create_snowflake_table(database_name, table_name, schema)
-        
-        csv_to_s3_task = csv_to_s3(database_name, table_name)
+			create_table_task = create_sf_table(runtime_params)
+			run_backfill_task = run_backfill_pipeline(runtime_params)
+			
+			create_table_task >> run_backfill_task
 
-        columns = format_cols_for_copy_into(table_definitions)
-        s3_to_snowflake_task = s3_to_snowflake(database_name, table_name, aod, columns)
+	start >> backfill_table >> end
 
-        # Define the dependencies within the TaskGroup
-        create_snowflake_table_task >> csv_to_s3_task >> s3_to_snowflake_task
-
-        # Append the TaskGroup to the backfill_task_group list
-        backfill_task_group.append(create_snowflake_table_task)
-        backfill_task_group.append(csv_to_s3_task)
-        backfill_task_group.append(s3_to_snowflake_task)
-
-    # Define the task dependencies outside the TaskGroup
-    start >> backfill_task_group >> end
-
-# Instantiate the DAG
-backfill_dag = backfill_dag()
+backfill_dag = Backfill_DAG()
