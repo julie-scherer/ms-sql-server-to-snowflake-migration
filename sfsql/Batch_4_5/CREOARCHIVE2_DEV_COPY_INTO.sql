@@ -6,17 +6,17 @@ COPY INTO ARES.STG.CREO_DatasetCell_HIST FROM (
         ($1)::bigint, 	-- $1: DATASET_ROW_KEY BIGINT NOT NULL
 		($2)::int, 	-- $2: DATASET_COLUMN_KEY INT NOT NULL
 		($3)::bigint 	-- $3: DATASET_VALUE_KEY BIGINT NOT NULL
-    FROM @ETL.INBOUND/CREOArchive/Backfill/DatasetCell/
+    -- FROM @ETL.INBOUND/CREOArchive/Backfill/DatasetCell/
+    FROM @DEV_JS.STG.TEST_STAGE/CREOArchive/Backfill/DatasetCell/
 )
 FILE_FORMAT = (
     TYPE = CSV
     COMPRESSION = GZIP
     FIELD_DELIMITER = '|'
     RECORD_DELIMITER = '\n'
-    SKIP_HEADER = 1
-    REPLACE_INVALID_CHARACTERS = TRUE
+    SKIP_HEADER = 0
     NULL_IF = 'NULL'
-
+    REPLACE_INVALID_CHARACTERS = TRUE
 )
 PATTERN = '.*DatasetCell_Backfill_[0-9]+\.csv\.gz';
 /*
@@ -38,17 +38,17 @@ COPY INTO ARES.STG.CREO_DatasetRow_HIST FROM (
         ($1)::bigint, 	-- $1: DATASET_ROW_KEY BIGINT NOT NULL
 		($2)::int, 	-- $2: DATASET_KEY INT NOT NULL
 		($3)::boolean 	-- $3: HAS_MESSAGE BOOLEAN NOT NULL
-    FROM @ETL.INBOUND/CREOArchive/Backfill/DatasetRow/
+    -- FROM @ETL.INBOUND/CREOArchive/Backfill/DatasetRow/
+    FROM @DEV_JS.STG.TEST_STAGE/CREOArchive/Backfill/DatasetRow/
 )
 FILE_FORMAT = (
     TYPE = CSV
     COMPRESSION = GZIP
     FIELD_DELIMITER = '|'
     RECORD_DELIMITER = '\n'
-    SKIP_HEADER = 1
-    REPLACE_INVALID_CHARACTERS = TRUE
+    SKIP_HEADER = 0
     NULL_IF = 'NULL'
-
+    REPLACE_INVALID_CHARACTERS = TRUE
 )
 PATTERN = '.*DatasetRow_Backfill_[0-9]+\.csv\.gz';
 /*
@@ -68,17 +68,17 @@ COPY INTO ARES.STG.CREO_Global_HIST FROM (
     SELECT 
         METADATA$FILENAME, CURRENT_TIMESTAMP(), to_date('2023-08-03'), 
         ($1)::decimal 	-- $1: APP_VERSION DECIMAL(38,0) NOT NULL
-    FROM @ETL.INBOUND/CREOArchive/Backfill/Global/
+    -- FROM @ETL.INBOUND/CREOArchive/Backfill/Global/
+    FROM @DEV_JS.STG.TEST_STAGE/CREOArchive/Backfill/Global/
 )
 FILE_FORMAT = (
     TYPE = CSV
     COMPRESSION = GZIP
     FIELD_DELIMITER = '|'
     RECORD_DELIMITER = '\n'
-    SKIP_HEADER = 1
-    REPLACE_INVALID_CHARACTERS = TRUE
+    SKIP_HEADER = 0
     NULL_IF = 'NULL'
-
+    REPLACE_INVALID_CHARACTERS = TRUE
 )
 PATTERN = '.*Global_Backfill_[0-9]+\.csv\.gz';
 /*
@@ -119,17 +119,17 @@ COPY INTO ARES.STG.CREO_Message_HIST FROM (
 		($20)::boolean, 	-- $20: IS_FINISHED BOOLEAN NOT NULL
 		($21)::varchar, 	-- $21: HEADERS VARCHAR NULL
 		($22)::varchar 	-- $22: VENDOR_ID VARCHAR(8000) NULL
-    FROM @ETL.INBOUND/CREOArchive/Backfill/Message/
+    -- FROM @ETL.INBOUND/CREOArchive/Backfill/Message/
+    FROM @DEV_JS.STG.TEST_STAGE/CREOArchive/Backfill/Message/
 )
 FILE_FORMAT = (
     TYPE = CSV
     COMPRESSION = GZIP
     FIELD_DELIMITER = '|'
     RECORD_DELIMITER = '\n'
-    SKIP_HEADER = 1
-    REPLACE_INVALID_CHARACTERS = TRUE
+    SKIP_HEADER = 0
     NULL_IF = 'NULL'
-
+    REPLACE_INVALID_CHARACTERS = TRUE
 )
 PATTERN = '.*Message_Backfill_[0-9]+\.csv\.gz';
 /*
@@ -152,17 +152,17 @@ COPY INTO ARES.STG.CREO_MessageContactV2_HIST FROM (
 		($2)::bigint, 	-- $2: MESSAGE_KEY BIGINT NOT NULL
 		($3)::int, 	-- $3: CONTACT_KEY INT NOT NULL
 		($4)::int 	-- $4: TYPE INT NOT NULL
-    FROM @ETL.INBOUND/CREOArchive/Backfill/MessageContactV2/
+    -- FROM @ETL.INBOUND/CREOArchive/Backfill/MessageContactV2/
+    FROM @DEV_JS.STG.TEST_STAGE/CREOArchive/Backfill/MessageContactV2/
 )
 FILE_FORMAT = (
     TYPE = CSV
     COMPRESSION = GZIP
     FIELD_DELIMITER = '|'
     RECORD_DELIMITER = '\n'
-    SKIP_HEADER = 1
-    REPLACE_INVALID_CHARACTERS = TRUE
+    SKIP_HEADER = 0
     NULL_IF = 'NULL'
-
+    REPLACE_INVALID_CHARACTERS = TRUE
 )
 PATTERN = '.*MessageContactV2_Backfill_[0-9]+\.csv\.gz';
 /*
@@ -186,17 +186,17 @@ COPY INTO ARES.STG.CREO_MessageDeliveryStatus_HIST FROM (
 		($3)::int, 	-- $3: DELIVERY_STATUS_KEY INT NOT NULL
 		to_timestamp_ntz($4), 	-- $4: DATE_ENTERED TIMESTAMP_LTZ NOT NULL
 		($5)::varchar 	-- $5: DETAIL VARCHAR NULL
-    FROM @ETL.INBOUND/CREOArchive/Backfill/MessageDeliveryStatus/
+    -- FROM @ETL.INBOUND/CREOArchive/Backfill/MessageDeliveryStatus/
+    FROM @DEV_JS.STG.TEST_STAGE/CREOArchive/Backfill/MessageDeliveryStatus/
 )
 FILE_FORMAT = (
     TYPE = CSV
     COMPRESSION = GZIP
     FIELD_DELIMITER = '|'
     RECORD_DELIMITER = '\n'
-    SKIP_HEADER = 1
-    REPLACE_INVALID_CHARACTERS = TRUE
+    SKIP_HEADER = 0
     NULL_IF = 'NULL'
-
+    REPLACE_INVALID_CHARACTERS = TRUE
 )
 PATTERN = '.*MessageDeliveryStatus_Backfill_[0-9]+\.csv\.gz';
 /*
@@ -220,17 +220,17 @@ COPY INTO ARES.STG.CREO_MessagePartV2_HIST FROM (
 		($3)::varchar, 	-- $3: CONTENT_TYPE VARCHAR(8000) NULL
 		($4)::varchar, 	-- $4: FILENAME VARCHAR(8000) NULL
 		($5)::varbinary 	-- $5: DATA VARBINARY NULL
-    FROM @ETL.INBOUND/CREOArchive/Backfill/MessagePartV2/
+    -- FROM @ETL.INBOUND/CREOArchive/Backfill/MessagePartV2/
+    FROM @DEV_JS.STG.TEST_STAGE/CREOArchive/Backfill/MessagePartV2/
 )
 FILE_FORMAT = (
     TYPE = CSV
     COMPRESSION = GZIP
     FIELD_DELIMITER = '|'
     RECORD_DELIMITER = '\n'
-    SKIP_HEADER = 1
-    REPLACE_INVALID_CHARACTERS = TRUE
+    SKIP_HEADER = 0
     NULL_IF = 'NULL'
-
+    REPLACE_INVALID_CHARACTERS = TRUE
 )
 PATTERN = '.*MessagePartV2_Backfill_[0-9]+\.csv\.gz';
 /*
@@ -252,17 +252,17 @@ COPY INTO ARES.STG.CREO_DatasetCell_HIST FROM (
         ($1)::bigint, 	-- $1: DATASET_ROW_KEY BIGINT NOT NULL
 		($2)::int, 	-- $2: DATASET_COLUMN_KEY INT NOT NULL
 		($3)::bigint 	-- $3: DATASET_VALUE_KEY BIGINT NOT NULL
-    FROM @ETL.INBOUND/CREOArchive2/Backfill/DatasetCell/
+    -- FROM @ETL.INBOUND/CREOArchive2/Backfill/DatasetCell/
+    FROM @DEV_JS.STG.TEST_STAGE/CREOArchive2/Backfill/DatasetCell/
 )
 FILE_FORMAT = (
     TYPE = CSV
     COMPRESSION = GZIP
     FIELD_DELIMITER = '|'
     RECORD_DELIMITER = '\n'
-    SKIP_HEADER = 1
-    REPLACE_INVALID_CHARACTERS = TRUE
+    SKIP_HEADER = 0
     NULL_IF = 'NULL'
-
+    REPLACE_INVALID_CHARACTERS = TRUE
 )
 PATTERN = '.*DatasetCell_Backfill_[0-9]+\.csv\.gz';
 /*
@@ -284,17 +284,17 @@ COPY INTO ARES.STG.CREO_DatasetRow_HIST FROM (
         ($1)::bigint, 	-- $1: DATASET_ROW_KEY BIGINT NOT NULL
 		($2)::int, 	-- $2: DATASET_KEY INT NOT NULL
 		($3)::boolean 	-- $3: HAS_MESSAGE BOOLEAN NOT NULL
-    FROM @ETL.INBOUND/CREOArchive2/Backfill/DatasetRow/
+    -- FROM @ETL.INBOUND/CREOArchive2/Backfill/DatasetRow/
+    FROM @DEV_JS.STG.TEST_STAGE/CREOArchive2/Backfill/DatasetRow/
 )
 FILE_FORMAT = (
     TYPE = CSV
     COMPRESSION = GZIP
     FIELD_DELIMITER = '|'
     RECORD_DELIMITER = '\n'
-    SKIP_HEADER = 1
-    REPLACE_INVALID_CHARACTERS = TRUE
+    SKIP_HEADER = 0
     NULL_IF = 'NULL'
-
+    REPLACE_INVALID_CHARACTERS = TRUE
 )
 PATTERN = '.*DatasetRow_Backfill_[0-9]+\.csv\.gz';
 /*
@@ -335,17 +335,17 @@ COPY INTO ARES.STG.CREO_Message_HIST FROM (
 		($20)::boolean, 	-- $20: IS_FINISHED BOOLEAN NOT NULL
 		($21)::varchar, 	-- $21: HEADERS VARCHAR NULL
 		($22)::varchar 	-- $22: VENDOR_ID VARCHAR(8000) NULL
-    FROM @ETL.INBOUND/CREOArchive2/Backfill/Message/
+    -- FROM @ETL.INBOUND/CREOArchive2/Backfill/Message/
+    FROM @DEV_JS.STG.TEST_STAGE/CREOArchive2/Backfill/Message/
 )
 FILE_FORMAT = (
     TYPE = CSV
     COMPRESSION = GZIP
-    FIELD_DELIMITER = '|'
+    FIELD_DELIMITER = '^'
     RECORD_DELIMITER = '\n'
-    SKIP_HEADER = 1
-    REPLACE_INVALID_CHARACTERS = TRUE
+    SKIP_HEADER = 0
     NULL_IF = 'NULL'
-
+    REPLACE_INVALID_CHARACTERS = TRUE
 )
 PATTERN = '.*Message_Backfill_[0-9]+\.csv\.gz';
 /*
@@ -368,17 +368,17 @@ COPY INTO ARES.STG.CREO_MessageContactV2_HIST FROM (
 		($2)::bigint, 	-- $2: MESSAGE_KEY BIGINT NOT NULL
 		($3)::int, 	-- $3: CONTACT_KEY INT NOT NULL
 		($4)::int 	-- $4: TYPE INT NOT NULL
-    FROM @ETL.INBOUND/CREOArchive2/Backfill/MessageContactV2/
+    -- FROM @ETL.INBOUND/CREOArchive2/Backfill/MessageContactV2/
+    FROM @DEV_JS.STG.TEST_STAGE/CREOArchive2/Backfill/MessageContactV2/
 )
 FILE_FORMAT = (
     TYPE = CSV
     COMPRESSION = GZIP
     FIELD_DELIMITER = '|'
     RECORD_DELIMITER = '\n'
-    SKIP_HEADER = 1
-    REPLACE_INVALID_CHARACTERS = TRUE
+    SKIP_HEADER = 0
     NULL_IF = 'NULL'
-
+    REPLACE_INVALID_CHARACTERS = TRUE
 )
 PATTERN = '.*MessageContactV2_Backfill_[0-9]+\.csv\.gz';
 /*
@@ -402,17 +402,17 @@ COPY INTO ARES.STG.CREO_MessageDeliveryStatus_HIST FROM (
 		($3)::int, 	-- $3: DELIVERY_STATUS_KEY INT NOT NULL
 		to_timestamp_ntz($4), 	-- $4: DATE_ENTERED TIMESTAMP_LTZ NOT NULL
 		($5)::varchar 	-- $5: DETAIL VARCHAR NULL
-    FROM @ETL.INBOUND/CREOArchive2/Backfill/MessageDeliveryStatus/
+    -- FROM @ETL.INBOUND/CREOArchive2/Backfill/MessageDeliveryStatus/
+    FROM @DEV_JS.STG.TEST_STAGE/CREOArchive2/Backfill/MessageDeliveryStatus/
 )
 FILE_FORMAT = (
     TYPE = CSV
     COMPRESSION = GZIP
     FIELD_DELIMITER = '|'
     RECORD_DELIMITER = '\n'
-    SKIP_HEADER = 1
-    REPLACE_INVALID_CHARACTERS = TRUE
+    SKIP_HEADER = 0
     NULL_IF = 'NULL'
-
+    REPLACE_INVALID_CHARACTERS = TRUE
 )
 PATTERN = '.*MessageDeliveryStatus_Backfill_[0-9]+\.csv\.gz';
 /*
@@ -436,17 +436,17 @@ COPY INTO ARES.STG.CREO_MessagePartV2_HIST FROM (
 		($3)::varchar, 	-- $3: CONTENT_TYPE VARCHAR(8000) NULL
 		($4)::varchar, 	-- $4: FILENAME VARCHAR(8000) NULL
 		($5)::varbinary 	-- $5: DATA VARBINARY NULL
-    FROM @ETL.INBOUND/CREOArchive2/Backfill/MessagePartV2/
+    -- FROM @ETL.INBOUND/CREOArchive2/Backfill/MessagePartV2/
+    FROM @DEV_JS.STG.TEST_STAGE/CREOArchive2/Backfill/MessagePartV2/
 )
 FILE_FORMAT = (
     TYPE = CSV
     COMPRESSION = GZIP
     FIELD_DELIMITER = '|'
     RECORD_DELIMITER = '\n'
-    SKIP_HEADER = 1
-    REPLACE_INVALID_CHARACTERS = TRUE
+    SKIP_HEADER = 0
     NULL_IF = 'NULL'
-
+    REPLACE_INVALID_CHARACTERS = TRUE
 )
 PATTERN = '.*MessagePartV2_Backfill_[0-9]+\.csv\.gz';
 /*
