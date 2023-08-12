@@ -1,4 +1,9 @@
+import os
 import pandas as pd
+
+out_path = os.path.join(os.getcwd(), 'dict_to_csv', 'CREO_Utils.py')
+csv_path = os.path.join(os.getcwd(), 'dict_to_csv', 'CREO.csv') #'staging_utils/ddl_to_dict/CREO.csv'
+
 
 # ** BATCH 1 **
 # from utils.Staging_CM_utils import fullTableList as utils_cm
@@ -7,8 +12,9 @@ import pandas as pd
 # util_names = ['utils_cm', 'utils_ld']
 
 # ** BATCH 2 **
-from utils.Staging_CREO_utils import fullTableList as utils_creo
-utils = [utils_creo]
+import CREO_Utils as utils
+# from utils.Staging_CREO_utils import fullTableList as utils_creo
+utils = [utils.fullTableList]
 util_names = ['utils_creo']
 
 # ** BATCH 3 **
@@ -22,9 +28,8 @@ def utils_to_csv(util_data, table_name):
         util_data, 
         orient='index'
     ).reset_index(level=0).rename(columns={'index':'table_name'})
-    filename = f'csvs/{table_name}.csv'
     df.to_csv(
-        filename,
+        csv_path,
         na_rep='NULL',
         sep="|",
         header=True,

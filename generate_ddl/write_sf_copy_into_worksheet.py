@@ -150,14 +150,14 @@ def write_copy_into_snowflake():
             # col_names_joined = ', '.join(column_names)
             # print(f"Column names joined: \n{col_names_joined}")
 
-            # Format the schema
-            fschema = re.sub(r'(?<![0-9]),', ',\n\t', raw_ddl).replace('"en-ci"',"'en-ci'").replace(' ,',',')
+            # # Format the schema
+            # fschema = re.sub(r'(?<![0-9]),', ',\n\t', raw_ddl).replace('"en-ci"',"'en-ci'").replace(' ,',',')
 
-            # Replace any strings if specified above
-            if replacements and replacements != [('','')]:
-                print("Replacements found. Working on it...")
-                for replacement in replacements:
-                    fschema = fschema.replace(replacement[0], replacement[1])
+            # # Replace any strings if specified above
+            # if replacements and replacements != [('','')]:
+            #     print("Replacements found. Working on it...")
+            #     for replacement in replacements:
+            #         fschema = fschema.replace(replacement[0], replacement[1])
 
             # Get the COPY INTO query for the current table and add to longer text with all the queries
             fcols = format_cols_for_copy_into(columns) # get formatted columns

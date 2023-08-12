@@ -1,3 +1,14 @@
+utils-dict:
+	cd convert_tablelist_utils; \
+	source .venv/bin/activate; \
+	python3 ddl_to_dict/create_creo_utils_dict.py;\
+
+utils-csv:
+	cd convert_tablelist_utils; \
+	source .venv/bin/activate; \
+	python3 dict_to_csv/export_json_to_csv.py;\
+
+
 # CREATE TABLE and COPY INTO Worksheets for testing
 create-dev:
 	export TESTING=True; \

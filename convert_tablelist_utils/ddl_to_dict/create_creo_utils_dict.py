@@ -1,72 +1,86 @@
+import os
 import json
-import re
 
+'''
 example = {
-    "table_name": "",
-    "sql": None,
-    "table_filtered_by": True,
-    "key_column": None
+        "CREO_APPROVALREQUEST_HIST": {
+        "sql": None,
+        "key_column": "APPROVAL_REQUEST_KEY",
+        "keys": "{'APPROVAL_REQUEST_KEY', 'PACKAGE_KEY'}",
+        "table_filtered_by": "ENTERED_AT",
+    }
 }
+'''
+
+DATABASE_NAME = 'CREO'
+TABLES = ['ApprovalRequest', 'ApprovalRequestItem', 'Campaign', 'CampaignType', 'Communication', 'CommunicationMailing', 'Config', 'ConfigHistory', 'Contact', 'ContactType', 'Container', 'Dataset', 'DatasetCell', 'DatasetColumn', 'DatasetRow', 'DatasetValue', 'Datasource', 'DeadMessages', 'DeadMessages2', 'DeliveryStatus', 'Emoji', 'Folder', 'FolderContact', 'FolderMessage', 'Global', 'Log', 'Message', 'MessageContact', 'MessageContactType', 'MessageContactV2', 'MessageDeliveryStatus', 'MessagePart', 'MessagePartV2', 'MessageStatusQueue', 'MessageType', 'Package', 'PackageTemplate', 'Parameter', 'Rule', 'Template', 'TemplateRule', 'TemplateType', 'TempMessage', 'User', 'WebHook']
+
+csv_path = os.path.join(os.getcwd(), 'ddl_to_dict', '{DATABASE_NAME}.csv') ## CSV exported from MSSQL with the table definitions
+out_path = os.path.join(os.getcwd(), 'ddl_to_dict', '{DATABASE_NAME}_Utils.py')
 
 def transform():
-    file = 'staging_utils/ddl_to_dict/CREO.csv'
-    creo_dict = {}
-    tables = ['ApprovalRequest', 'ApprovalRequestItem', 'Campaign', 'CampaignType', 'Communication', 'CommunicationMailing', 'Config', 'ConfigHistory', 'Contact', 'ContactType', 'Container', 'Dataset', 'DatasetCell', 'DatasetColumn', 'DatasetRow', 'DatasetValue', 'Datasource', 'DeadMessages', 'DeadMessages2', 'DeliveryStatus', 'Emoji', 'Folder', 'FolderContact', 'FolderMessage', 'Global', 'Log', 'Message', 'MessageContact', 'MessageContactType', 'MessageContactV2', 'MessageDeliveryStatus', 'MessagePart', 'MessagePartV2', 'MessageStatusQueue', 'MessageType', 'Package', 'PackageTemplate', 'Parameter', 'Rule', 'Template', 'TemplateRule', 'TemplateType', 'TempMessage', 'User', 'WebHook']
-    with open(file, "r") as file:
-        # print(file)
+    db_dict = {}
+    with open(csv_path, "r") as file:
         for line in file.readlines():
-            # print(line)
-
             L = line.split(',"')
-            # print(L)
             
             tbl = L[0].replace("\ufeff", "")
-            schema = L[1].replace("'","").replace('"','').replace("\n", "")
-            # print(f"{tbl} = {schema}")
+            schema = L[1].replace('"en-ci"',"").replace("NOT NULL", "").replace("NULL", "").replace("'","").replace('"','').replace("\n", "").replace(',',"").strip()
+            print(f"{tbl} = {schema.split()}")
 
-            tbl_dict = creo_dict.get(tbl, {})
+            tbl_dict = db_dict.get(tbl, {})
 
+            # 1! Custom SQL file
             tbl_dict["sql"] = None
 
+            # 2! Key column
+            tbl_dict["key_column"] = schema.split()[0]
+
+            # 3! Keys
+            keys = [word for word in schema.split() if '_KEY' in word]
+            tbl_dict["keys"] = f'{set(keys)}'
+
+            # 4! Filtered by column
+            tbl_dict["table_filtered_by"] = None
             if 'DATE_ENTERED' in schema:
                 tbl_dict["table_filtered_by"] = "DATE_ENTERED"
             elif 'ENTERED_AT' in schema:
                 tbl_dict["table_filtered_by"] = "ENTERED_AT"
             elif 'DATE_SENT' in schema:
                 tbl_dict["table_filtered_by"] = "DATE_SENT"
+            elif 'DATE_COMPLETED' in schema:
+                tbl_dict["table_filtered_by"] = "DATE_COMPLETED"
+            elif 'DATE_STARTED' in schema:
+                tbl_dict["table_filtered_by"] = "DATE_STARTED"
+            elif 'DATE_ENDED' in schema:
+                tbl_dict["table_filtered_by"] = "DATE_ENDED"
+            elif 'DATE_UPDATED' in schema:
+                tbl_dict["table_filtered_by"] = "DATE_UPDATED"
             elif 'DATE_START' in schema:
                 tbl_dict["table_filtered_by"] = "DATE_START"
             elif 'DATE_END' in schema:
                 tbl_dict["table_filtered_by"] = "DATE_END"
             else:
                 tbl_dict["table_filtered_by"] = None
-            
-            word_parts = re.findall('[A-Z][^A-Z]*', tbl)
-            hyphenated_tbl = '_'.join(word_parts).upper() # Join the parts with underscores and convert to uppercase
-            hyphenated_key = hyphenated_tbl + "_KEY" # Add "_KEY" at the end
-            if hyphenated_key in schema:
-                tbl_dict["key_column"] = hyphenated_key
-            else:
-                tbl_dict["key_column"] = None
-            
-            creo_dict[f"CREO_{tbl.upper()}_HIST"] = tbl_dict
 
-    if len(tables) != len(creo_dict):
+            db_dict[f"{DATABASE_NAME}_{tbl.upper()}_HIST"] = tbl_dict
+
+    if len(TABLES) != len(db_dict):
         print("[ERROR] - Dictionary missing tables")
     else:
         print("[SUCCESS] - All tables added")
     
-    # print(f"fullTableList = {creo_dict}")
-    return creo_dict
+    # print(f"fullTableList = {db_dict}")
+    return db_dict
 
 
 def export_dict():
-    creo_dict = transform()
-    res = json.dumps(creo_dict, indent=2)
-    fres = res.replace('false','False').replace('true','True').replace('null', 'None')
-    return fres
+    db_dict = transform()
+    db_dict = json.dumps(db_dict, indent=2)
+    result = db_dict.replace('false','False').replace('true','True').replace('null', 'None')
+    return result
 
-with open('staging_utils/ddl_to_dict/CREO_Utils.py','+w') as file:
+with open(f'{out_path}','+w') as file:
     fullTableList = export_dict()
     file.write(f"fullTableList = {fullTableList}")
     print("[SUCCESS] - File created")
