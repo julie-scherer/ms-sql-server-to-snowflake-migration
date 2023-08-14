@@ -1,0 +1,11 @@
+dag_id: 'Generate_VC_DDL'
+schedule_interval: '@once'
+catchup: False
+
+MSSQL_CONN_ID: 'mssql_ictvcsql_winchkictvc_conn'
+S3_CONN_ID: 'aws_s3_conn'
+SNOWFLAKE_CONN_ID: 'snowflake_default'
+
+SNOWFLAKE_DATABASE: 'ARES'
+SNOWFLAKE_SCHEMA: 'ETL'
+MSSQL_DATABASE: 'VC'

@@ -1,0 +1,24 @@
+dag_id: 'Backfill_LD_Pandas'
+schedule_interval: '@once'
+catchup: False
+
+MSSQL_CONN_ID: 'awsmssql_canldsql_winchkcanld_conn'
+S3_CONN_ID: 'aws_s3_conn'
+SNOWFLAKE_CONN_ID: 'snowflake_default'
+
+SNOWFLAKE_DATABASE: 'ARES'
+SNOWFLAKE_SCHEMA: 'STG'
+MSSQL_DATABASE: 'LD'
+TABLE_LIST: []
+
+COL_SEP: '|'
+LINE_SEP: '\\n'
+FILE_FORMAT: "
+TYPE = CSV \n
+COMPRESSION = AUTO \n
+FIELD_DELIMITER = '{COL_SEP}' \n
+RECORD_DELIMITER = '{LINE_SEP}' \n
+SKIP_HEADER = 0 \n
+REPLACE_INVALID_CHARACTERS = TRUE \n
+"
+CHUNK_SIZE: 20000

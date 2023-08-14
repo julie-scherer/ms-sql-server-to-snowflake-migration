@@ -1,0 +1,26 @@
+dag_id: 'Backfill_VC_MSSQL'
+schedule_interval: '@once'
+catchup: False
+
+MSSQL_CONN_ID: 'mssql_ictvcsql_winchkictvc_conn'
+S3_CONN_ID: 'aws_s3_conn'
+SNOWFLAKE_CONN_ID: 'snowflake_default'
+
+SNOWFLAKE_DATABASE: 'ARES'
+SNOWFLAKE_SCHEMA: 'STG'
+MSSQL_DATABASE: 'VC'
+TABLE_LIST: []
+
+COL_SEP: '|'
+LINE_SEP: '\\n'
+FILE_FORMAT: "
+TYPE = CSV \n
+COMPRESSION = AUTO \n
+FIELD_DELIMITER = '{COL_SEP}' \n
+RECORD_DELIMITER = '{LINE_SEP}' \n
+SKIP_HEADER = 0 \n
+REPLACE_INVALID_CHARACTERS = TRUE \n
+"
+
+BATCH_START_IDX: 0
+BATCH_SIZE: 500000

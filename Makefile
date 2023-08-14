@@ -1,10 +1,10 @@
 utils-dict:
-	cd convert_tablelist_utils; \
+	cd staging_utils; \
 	source .venv/bin/activate; \
 	python3 ddl_to_dict/create_creo_utils_dict.py;\
 
 utils-csv:
-	cd convert_tablelist_utils; \
+	cd staging_utils; \
 	source .venv/bin/activate; \
 	python3 dict_to_csv/export_json_to_csv.py;\
 
