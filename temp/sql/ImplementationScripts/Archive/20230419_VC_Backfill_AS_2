@@ -1,0 +1,200 @@
+COPY INTO STG.VC_APIAPPLICATION_HIST FROM
+(select METADATA$FILENAME, CURRENT_TIMESTAMP(), to_date('2023-04-10'), 
+$1, $2, $3, $4, 
+case when $5 = '' then null else to_timestamp_ntz($5, 'MM/DD/YYYY HH12:MI:ss AM') end
+from @ETL.INBOUND)
+FILE_FORMAT = ( FORMAT_NAME = STG.LD_CSV_PIPE_SH1_EON_GZ)
+pattern= 'inbound/VC/Backfill/ApiApplication/ApiApplication_Backfill.csv'
+Force = True;
+
+COPY INTO STG.VC_ASPECTEXPORTJOB_HIST FROM
+(select METADATA$FILENAME, CURRENT_TIMESTAMP(), to_date('2023-04-10'), 
+$1, $2, $3, 
+case when $4 = True then 1 else 0 end
+from @ETL.INBOUND)
+FILE_FORMAT = ( FORMAT_NAME = STG.LD_CSV_PIPE_SH1_EON_GZ)
+pattern= 'inbound/VC/Backfill/AspectExportJob/AspectExportJob_Backfill.csv'
+Force = True;
+
+COPY INTO STG.VC_BALSHEETCOLUMNS2_HIST FROM
+(select METADATA$FILENAME, CURRENT_TIMESTAMP(), to_date('2023-04-10'), 
+$1, $2, $3, $4, $5, $6, $7
+from @ETL.INBOUND)
+FILE_FORMAT = ( FORMAT_NAME = STG.LD_CSV_PIPE_SH1_EON_GZ)
+pattern= 'inbound/VC/Backfill/BalSheetColumns2/BalSheetColumns2_Backill.csv'
+Force = True;
+
+COPY INTO STG.VC_BANKPARENT_HIST FROM
+(select METADATA$FILENAME, CURRENT_TIMESTAMP(), to_date('2023-04-10'), 
+$1, $2, $3, 
+case when $4 = True then 1 else 0 end, $5, $6
+from @ETL.INBOUND)
+FILE_FORMAT = ( FORMAT_NAME = STG.LD_CSV_PIPE_SH1_EON_GZ)
+pattern= 'inbound/VC/Backfill/BankParent/BankParent_Backfill.csv'
+Force = True;
+
+COPY INTO STG.VC_BANKSTATUS_HIST FROM
+(select METADATA$FILENAME, CURRENT_TIMESTAMP(), to_date('2023-04-10'), 
+$1, $2
+from @ETL.INBOUND)
+FILE_FORMAT = ( FORMAT_NAME = STG.LD_CSV_PIPE_SH1_EON_GZ)
+pattern= 'inbound/VC/Backfill/BankStatus/BankStatus_Backfill.csv'
+Force = True;
+
+COPY INTO STG.VC_BOOLEANQUESTION_HIST FROM
+(select METADATA$FILENAME, CURRENT_TIMESTAMP(), to_date('2023-04-10'), 
+$1, $2, $3
+from @ETL.INBOUND)
+FILE_FORMAT = ( FORMAT_NAME = STG.LD_CSV_PIPE_SH1_EON_GZ)
+pattern= 'inbound/VC/Backfill/BooleanQuestion/BooleanQuestion_Backfill.csv'
+Force = True;
+
+COPY INTO STG.VC_BUMPUPTIERTYPE_HIST FROM
+(select METADATA$FILENAME, CURRENT_TIMESTAMP(), to_date('2023-04-10'), 
+$1, $2
+from @ETL.INBOUND)
+FILE_FORMAT = ( FORMAT_NAME = STG.LD_CSV_PIPE_SH1_EON_GZ)
+pattern= 'inbound/VC/Backfill/BumpUpTierType/BumpUpTierType_Backfill.csv'
+Force = True;
+
+COPY INTO STG.VC_BUSINESSENTITY_HIST FROM
+(select METADATA$FILENAME, CURRENT_TIMESTAMP(), to_date('2023-04-10'), 
+$1, $2, 
+case when $3 = True then 1 else 0 end, $4
+from @ETL.INBOUND)
+FILE_FORMAT = ( FORMAT_NAME = STG.LD_CSV_PIPE_SH1_EON_GZ)
+pattern= 'inbound/VC/Backfill/BusinessEntity/BusinessEntity_Backfill.csv'
+Force = True;
+
+COPY INTO STG.VC_CAPSRUNSTATUS_HIST FROM
+(select METADATA$FILENAME, CURRENT_TIMESTAMP(), to_date('2023-04-10'), 
+$1, $2
+from @ETL.INBOUND)
+FILE_FORMAT = ( FORMAT_NAME = STG.LD_CSV_PIPE_SH1_EON_GZ)
+pattern= 'inbound/VC/Backfill/CapsRunStatus/CapsRunStatus_Backfill.csv'
+Force = True;
+
+COPY INTO STG.VC_CARDFUNDINGREQUESTTYPE_HIST FROM
+(select METADATA$FILENAME, CURRENT_TIMESTAMP(), to_date('2023-04-10'), 
+$1, $2
+from @ETL.INBOUND)
+FILE_FORMAT = ( FORMAT_NAME = STG.LD_CSV_PIPE_SH1_EON_GZ)
+pattern= 'inbound/VC/Backfill/CardFundingRequestType/CardFundingRequestType_Backfill.csv'
+Force = True;
+
+COPY INTO STG.VC_CARDFUNDINGVENDOR_HIST FROM
+(select METADATA$FILENAME, CURRENT_TIMESTAMP(), to_date('2023-04-10'), 
+$1, $2
+from @ETL.INBOUND)
+FILE_FORMAT = ( FORMAT_NAME = STG.LD_CSV_PIPE_SH1_EON_GZ)
+pattern= 'inbound/VC/Backfill/CardFundingVendor/CardFundingVendor_Backfill.csv'
+Force = True;
+
+COPY INTO STG.VC_CARDGOVERNORACTIONTYPE_HIST FROM
+(select METADATA$FILENAME, CURRENT_TIMESTAMP(), to_date('2023-04-10'), 
+$1, $2, $3
+from @ETL.INBOUND)
+FILE_FORMAT = ( FORMAT_NAME = STG.LD_CSV_PIPE_SH1_EON_GZ)
+pattern= 'inbound/VC/Backfill/CardGovernorActionType/CardGovernorActionType_Backfill.csv'
+Force = True;
+
+COPY INTO STG.VC_CC_STATUS_HIST FROM
+(select METADATA$FILENAME, CURRENT_TIMESTAMP(), to_date('2023-04-10'), 
+$1, $2, $3
+from @ETL.INBOUND)
+FILE_FORMAT = ( FORMAT_NAME = STG.LD_CSV_PIPE_SH1_EON_GZ)
+pattern= 'inbound/VC/Backfill/CC_Status/CC_Status_Backfill.csv'
+Force = True;
+
+COPY INTO STG.VC_CHANNEL_HIST FROM
+(select METADATA$FILENAME, CURRENT_TIMESTAMP(), to_date('2023-04-10'), 
+$1, $2
+from @ETL.INBOUND)
+FILE_FORMAT = ( FORMAT_NAME = STG.LD_CSV_PIPE_SH1_EON_GZ)
+pattern= 'inbound/VC/Backfill/Channel/Channel_Backfill.csv'
+Force = True;
+
+COPY INTO STG.VC_CHANNELPAYMENTCOMMUNICATIONLIMIT_HIST FROM
+(select METADATA$FILENAME, CURRENT_TIMESTAMP(), to_date('2023-04-10'), 
+$1, $2, $3, $4, $5
+from @ETL.INBOUND)
+FILE_FORMAT = ( FORMAT_NAME = STG.LD_CSV_PIPE_SH1_EON_GZ)
+pattern= 'inbound/VC/Backfill/ChannelPaymentCommunicationLimit/ChannelPaymentCommunicationLimit_Backfill.csv'
+Force = True;
+
+COPY INTO STG.VC_CLIENTAPPLICATION_HIST FROM
+(select METADATA$FILENAME, CURRENT_TIMESTAMP(), to_date('2023-04-10'), 
+$1, $2, $3, 
+case when $4 = True then 1 else 0 end
+from @ETL.INBOUND)
+FILE_FORMAT = ( FORMAT_NAME = STG.LD_CSV_PIPE_SH1_EON_GZ)
+pattern= 'inbound/VC/Backfill/ClientApplication/ClientApplication_Backfill.csv'
+Force = True;
+
+COPY INTO STG.VC_CLRDATATYPE_HIST FROM
+(select METADATA$FILENAME, CURRENT_TIMESTAMP(), to_date('2023-04-10'), 
+$1, $2
+from @ETL.INBOUND)
+FILE_FORMAT = ( FORMAT_NAME = STG.LD_CSV_PIPE_SH1_EON_GZ)
+pattern= 'inbound/VC/Backfill/ClrDataType/ClrDataType_Backfill.csv'
+Force = True;
+
+COPY INTO STG.VC_CUSTOMERSDNCERT_HIST FROM
+(select METADATA$FILENAME, CURRENT_TIMESTAMP(), to_date('2023-04-10'), 
+$1, $2, 
+case when $3 = True then 1 else 0 end, 
+case when $4 = '' then null else to_timestamp_ntz($4, 'MM/DD/YYYY HH12:MI:ss AM') end, 
+case when $5 = True then 1 else 0 end, 
+case when $6 = True then 1 else 0 end, 
+case when $7 = True then 1 else 0 end, $8, $9, 
+case when $10 = '' then null else to_timestamp_ntz($10, 'MM/DD/YYYY HH12:MI:ss AM') end
+from @ETL.INBOUND)
+FILE_FORMAT = ( FORMAT_NAME = STG.LD_CSV_PIPE_SH1_EON_GZ)
+pattern= 'inbound/VC/Backfill/CustomerSDNCert/CustomerSDNCert_Backfill.csv'
+Force = True;
+
+COPY INTO STG.VC_GLACCTLOANPRODUCTGROUP_HIST FROM
+(select METADATA$FILENAME, CURRENT_TIMESTAMP(), to_date('2023-04-10'), 
+$1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23, $24, $25, $26, $27, $28, $29, $30, $31, $32, $33, $34, $35, $36, $37, $38
+from @ETL.INBOUND)
+FILE_FORMAT = ( FORMAT_NAME = STG.LD_CSV_PIPE_SH1_EON_GZ)
+pattern= 'inbound/VC/Backfill/GLAcctLoanProductGroup/GLAcctLoanProductGroup_Backfill.csv'
+Force = True;
+
+COPY INTO STG.VC_OPTPLUSCARRIER_HIST FROM
+(select METADATA$FILENAME, CURRENT_TIMESTAMP(), to_date('2023-04-10'), 
+$1, $2, $3, $4, $5, 
+case when $6 = '' then null else to_timestamp_ntz($6, 'MM/DD/YYYY HH12:MI:ss AM') end, $7, 
+case when $8 = '' then null else to_timestamp_ntz($8, 'MM/DD/YYYY HH12:MI:ss AM') end
+from @ETL.INBOUND)
+FILE_FORMAT = ( FORMAT_NAME = STG.LD_CSV_PIPE_SH1_EON_GZ)
+pattern= 'inbound/VC/Backfill/OptPlusCarrier/OptPlusCarrier_Backfill.csv'
+Force = True;
+
+COPY INTO STG.VC_RISREPTDONOTCONTACTTYPE_HIST FROM
+(select METADATA$FILENAME, CURRENT_TIMESTAMP(), to_date('2023-04-10'), 
+$1, $2
+from @ETL.INBOUND)
+FILE_FORMAT = ( FORMAT_NAME = STG.LD_CSV_PIPE_SH1_EON_GZ)
+pattern= 'inbound/VC/Backfill/RisReptDoNotContactType/RisReptDoNotContactType_Backfill.csv'
+Force = True;
+
+COPY INTO STG.VC_SECURITYQUESTION_HIST FROM
+(select METADATA$FILENAME, CURRENT_TIMESTAMP(), to_date('2023-04-10'), 
+$1, $2, 
+case when $3 = '' then null else to_timestamp_ntz($3, 'MM/DD/YYYY HH12:MI:ss AM') end, 
+case when $4 = True then 1 else 0 end
+from @ETL.INBOUND)
+FILE_FORMAT = ( FORMAT_NAME = STG.LD_CSV_PIPE_SH1_EON_GZ)
+pattern= 'inbound/VC/Backfill/SecurityQuestion/SecurityQuestion_Backfill.csv'
+Force = True;
+
+COPY INTO STG.VC_WEBCALLEMAILTEMPLATEATTACHMENT_HIST FROM
+(select METADATA$FILENAME, CURRENT_TIMESTAMP(), to_date('2023-04-10'), 
+$1, $2, $3, $4, 
+case when $5 = '' then null else to_timestamp_ntz($5, 'MM/DD/YYYY HH12:MI:ss AM') end, $6, 
+case when $7 = '' then null else to_timestamp_ntz($7, 'MM/DD/YYYY HH12:MI:ss AM') end, $8
+from @ETL.INBOUND)
+FILE_FORMAT = ( FORMAT_NAME = STG.LD_CSV_PIPE_SH1_EON_GZ)
+pattern= 'inbound/VC/Backfill/WebCallEmailTemplateAttachment/WebCallEmailTemplateAttachment_Backfill.csv'
+Force = True;

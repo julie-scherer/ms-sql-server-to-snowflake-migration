@@ -1,0 +1,1 @@
+select top 20 * from STG.CM_BALSHEET2_HIST;

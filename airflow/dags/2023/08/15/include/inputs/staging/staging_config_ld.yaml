@@ -1,0 +1,14 @@
+dag_id: 'Staging_LD'
+schedule_interval: '0 6 * * *'
+catchup: False
+
+TABLE_LIST: ['InsuranceEnrollment', 'LoanFunding', 'PresentmentRequest', 'OpenEndLoanStatement', 'OfferAccepted', 'AvailableOffer', 'TransDetail', 'OpenEndInterest', 'MPayInterest', 'Presentment', 'CustomerIncome', 'RBCEFundBatch', 'PromiseToPay', 'CreditCardResultCode', 'LoanProductConfig', 'LoanProduct', 'LoanPayment', 'LoanApplication', 'SPayInterest', 'Customer', 'CustomerAddress', 'CreditCardAttempts', 'CreditCardTrans', 'ACH_History', 'SERVICETRANS', 'SERVICEDETAIL', 'CASHEDCHECK', 'BalSheet2', 'EndOfDayRpt', 'Company', 'Loan', 'LoanIncome', 'PromiseToPayDetail', 'OpenEndLoan', 'RISREPT', 'ACH_Sent', 'MPayLoan', 'Transcode', 'CapsSkipReason', 'LoanProductFinancialGroup', 'LoanFundingStatus', 'PresentmentType', 'District', 'Region', 'Currency', 'Markets', 'LoanPaymentMPay', 'MPayAmort', 'RBCEFundBatchDetail', 'PresentmentRequestACHHistoryXREF', 'ACHBank', 'CreditCardVendor', 'OpenEndLoanStatementBalance', 'TellerID', 'SecurityGroupHistory', 'BalSheet_TransDetail', 'LoanPaymentOpenEnd', 'TRANSDETAILACCT', 'EndOfDayInventoryDetail']
+DATABASE_NAME: 'LD'
+FILE_FORMAT: 'FORMAT_NAME = STG.LD_CSV_PIPE_SH0_EON_GZ'
+COL_SEP: '|'
+AS_OF_DATE: '2023-07-01'
+METADATA_FILENAME: 'FILENAME'
+
+MSSQL_CONN_ID: 'awsmssql_canldsql_winchkcanld_conn'
+S3_CONN_ID: 'aws_s3_conn'
+SNOWFLAKE_CONN_ID: 'snowflake_default'

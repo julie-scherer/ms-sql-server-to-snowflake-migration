@@ -1,0 +1,10 @@
+dag_id: 'Staging_CM_Utils'
+schedule_interval: '@once'
+catchup: False
+
+MSSQL_CONN_ID: 'awsmssql_cansql_winchkcan_conn'
+S3_CONN_ID: 'aws_s3_conn'
+SNOWFLAKE_CONN_ID: 'snowflake_default'
+
+SNOWFLAKE_SCHEMA: 'ETL'
+MSSQL_DATABASE: 'CM'

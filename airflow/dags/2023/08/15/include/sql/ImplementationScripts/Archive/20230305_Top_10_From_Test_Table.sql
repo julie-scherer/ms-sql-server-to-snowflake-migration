@@ -1,0 +1,1 @@
+select top 10 * from STG.CM_CURRENCY_HIST;

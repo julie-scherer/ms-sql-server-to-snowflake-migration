@@ -1,0 +1,33 @@
+/*
+[dbo].FOLDERMESSAGE
+MESSAGE_KEY,FOLDER_KEY
+Join MESSAGE on MESSAGE_KEY, get DATE_ENTERED
+
+Columns that need to be in final query result:
+-- MESSAGE_KEY
+-- FOLDER_KEY
+-- LOCKED_BY
+-- IS_READ
+
+SELECT top 100
+    -- COUNT(*) -- 15600
+    fm.[MESSAGE_KEY]
+    ,fm.[FOLDER_KEY]
+    ,fm.[LOCKED_BY]
+    ,fm.[IS_READ]
+FROM [dbo].FOLDERMESSAGE fm
+LEFT JOIN [dbo].[MESSAGE] m
+ON fm.MESSAGE_KEY = m.MESSAGE_KEY
+WHERE fm.MESSAGE_KEY IS NOT NULL 
+AND fm.FOLDER_KEY IS NOT NULL;
+*/
+
+SELECT 
+    fm.[MESSAGE_KEY]
+    ,fm.[FOLDER_KEY]
+    ,fm.[LOCKED_BY]
+    ,fm.[IS_READ]
+FROM [dbo].FOLDERMESSAGE fm
+LEFT JOIN [dbo].[MESSAGE] m
+ON fm.MESSAGE_KEY = m.MESSAGE_KEY
+WHERE CAST([m.DATE_ENTERED] AS DATE) = CAST('{asOfDate}' AS DATE);

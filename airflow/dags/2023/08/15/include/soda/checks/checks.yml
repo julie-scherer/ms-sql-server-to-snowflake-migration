@@ -1,0 +1,7 @@
+checks for {table}:
+  - missing_count(ASOFDATE) = 0
+  - missing_count(FILENAME) = 0
+  - record_count_differential < 10:
+      record_count_differential query: |
+        SELECT {expected} - COUNT(*) FROM STG.{table} WHERE ASOFDATE = to_date('{md}')
+

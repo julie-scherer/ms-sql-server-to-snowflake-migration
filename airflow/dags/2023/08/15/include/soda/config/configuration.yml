@@ -1,0 +1,21 @@
+# the first line names the datasource "MY_DATASOURCE"
+data_source ds:
+  type: snowflake
+  connection:
+    # provide your snowflake username and password in double quotes
+    username: "{username}"
+    password: "{password}" #N?ez524z&GXSE,bu
+    # provide the account in the format xy12345.eu-central-1
+    # account: my_account
+    account: "{account}"
+    database: "{database}"
+    warehouse: "{warehouse}"
+    # warehouse: MY_WAREHOUSE
+    # if your connection times out you may need to adjust the timeout value
+    connection_timeout: 300
+    role: "{role}"
+    client_session_keep_alive: true
+    session_parameters:
+      QUERY_TAG: soda-queries
+      QUOTED_IDENTIFIERS_IGNORE_CASE: false
+  schema: "{schema}"
