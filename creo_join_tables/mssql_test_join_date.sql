@@ -1,51 +1,43 @@
-
+/*
 -- ** DATASETCELL **
--- Tables moving to CREOArchive:
+Tables moving to CREOArchive:
 -- DatasetCell
 -- DatasetRow
 
--- Table with DATE column:
+Table with DATE column:
 -- Dataset
 --  >> join with DatasetRow on DatasetKey
 
--- Steps:
--- 1. Union DatasetRow >> DATASET_ROW_KEY, DATASET_KEY
--- 2. Left join #1 with CREO.Dataset table to get date entered >> DATASET_ROW_KEY, DATE ENTERED
--- 3. Filter DATE_ENTERED column using date less than backfill date and greater than backfill date - 90 days
--- 4. Union DatasetCell >> DATASET_COLUMN_KEY, DATASET_ROW_KEY, DATASET_VALUE_KEY
+Steps:
+-- Union DatasetRow >> DATASET_ROW_KEY, DATASET_KEY
+-- Union DatasetCell >> DATASET_COLUMN_KEY, DATASET_ROW_KEY, DATASET_VALUE_KEY
+-- Join UnionDatasetCell with CREO.Dataset table to get date entered >> DATASET_ROW_KEY, DATE ENTERED
+-- Filter DATE_ENTERED column using date less than backfill date and greater than backfill date - 90 days
+*/
 
 WITH 
+    -- Union DatasetRow >> DATASET_ROW_KEY, DATASET_KEY
     UnionDatasetRow AS (
-        SELECT
-            DATASET_KEY
-            ,DATE_ENTERED
-        FROM CREO.[dbo].[Dataset]
-        UNION ALL 
-        SELECT
-            DATASET_KEY
-            ,DATE_ENTERED
-        FROM CREOArchive.[dbo].[Dataset]
-        WHERE CAST([DATE_ENTERED] AS DATE) <= CAST('2023-07-17' AS DATE) -- Filter out dates for efficiency
-        AND CAST([DATE_ENTERED] AS DATE) > DATEADD(DAY, -90, '2023-07-17')
+        SELECT DATASET_ROW_KEY, DATASET_KEY
+        FROM CREO.[dbo].[DatasetRow]
+        UNION 
+        SELECT DATASET_ROW_KEY, DATASET_KEY
+        FROM CREOArchive.[dbo].[DatasetRow]
     )
-    ,JoinedDatasetRowDate AS (
-        SELECT
-            DATASET_ROW_KEY
-            ,[DATE_ENTERED]
-        FROM UnionDataset AS uds
-        JOIN [dbo].[DATASETROW] dr  ON dr.DATASET_KEY = ds.DATASET_KEY -- Join DatasetRow with Dataset table to get DATE_ENTERED using DATASET_KEY
+    -- Join DatasetRow with Dataset table using DATASET_KEY to get DATE_ENTERED
+    ,DatasetRowDate AS (
+        SELECT udr.DATASET_ROW_KEY, ds.DATE_ENTERED
+        FROM UnionDatasetRow AS udr
+        JOIN CREO.[dbo].Dataset ds ON ds.DATASET_KEY = udr.DATASET_KEY 
+        WHERE CAST(ds.DATE_ENTERED AS DATE) = CAST('2023-07-17' AS DATE) -- Filter out dates here
+        -- AND CAST(ds.DATE_ENTERED AS DATE) > DATEADD(DAY, -90, '2023-07-17')
     )
+    -- Union DatasetCell >> DATASET_COLUMN_KEY, DATASET_ROW_KEY, DATASET_VALUE_KEY
     ,UnionDatasetCell AS (
-        SELECT
-            DATASET_COLUMN_KEY
-            ,DATASET_ROW_KEY
-            ,DATASET_VALUE_KEY
+        SELECT DATASET_COLUMN_KEY, DATASET_ROW_KEY, DATASET_VALUE_KEY
         FROM CREO.[dbo].[DatasetCell]
-        UNION ALL 
-        SELECT
-            DATASET_COLUMN_KEY
-            ,DATASET_ROW_KEY
-            ,DATASET_VALUE_KEY
+        UNION 
+        SELECT DATASET_COLUMN_KEY, DATASET_ROW_KEY, DATASET_VALUE_KEY
         FROM CREOArchive.[dbo].[DatasetCell] -- Join CREO and CREOArchive tables since some records move to archive since backfill
     )
     ,FilteredDatasetCell AS (
@@ -56,7 +48,7 @@ WITH
             -- ,rd.DATE_ENTERED
             -- ,ROW_NUMBER() OVER(ORDER BY rd.DATE_ENTERED ASC) AS RowNum
         FROM UnionDatasetCell udc
-        LEFT JOIN JoinedDatasetRowDate rd ON rd.DATASET_ROW_KEY = udc.DATASET_ROW_KEY -- Join DatasetCell with CTE with has dates filtered
+        LEFT JOIN DatasetRowDate rd ON rd.DATASET_ROW_KEY = udc.DATASET_ROW_KEY -- Join DatasetCell with CTE with has dates filtered
     )
 SELECT 
 count(*)
@@ -66,7 +58,7 @@ FROM FilteredDatasetCell
 -- ORDER BY RowNum DESC;
 
 -->> Record row count on or before 7/17/23
--- 1680061301
+-- 1,680,061,301
 
 -->> Record row count on or before 7/17/23 within a 90 day timespan
 -- 
