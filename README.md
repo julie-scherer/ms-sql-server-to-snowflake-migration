@@ -14,10 +14,10 @@ To run this repo, you need:
 ## **Setting up your local environment**
 
 ### Step 1: Create a virtual environment to run Python scripts
-Follow the steps below from the **`CURO-Astro/`** directory on your local computer:
-1. navigate to project folder
+Follow the steps below:
+1. clone the repository and navigate to the root folder of the project
     ```bash
-    cd mssql-snowflake-migration 
+    cd ms-sql-server-to-snowflake-migration
     ```
 2. create a virtual environment (skip if you've already walked through these steps and created a .venv folder)
     ```bash
@@ -35,10 +35,7 @@ Follow the steps below from the **`CURO-Astro/`** directory on your local comput
     ```
 
 ### Step 2: Update global variables and configurations in the repo
-1. Navigate to project folder from the `Curo-Astro` root directory
-    ```bash
-    cd mssql-snowflake-migration 
-    ```
+1. Open a terminal and navigate to the root folder of the repository on your local machine.
 2. Open **`scripts/utils.py`** and update **`MSSQL_SERVER`**, **`PROJECT_DIR`**, **`OUTPUT_DIR`**, and **`BATCH`** under the Utils class 
     > Please do not change the names of these variables, only the values, as the variables are used across multiple scripts
     >
@@ -73,7 +70,7 @@ Follow the steps below from the **`CURO-Astro/`** directory on your local comput
 ### Step 2: Create tables in Snowflake
 
 #### Step 2.1: Generate `CREATE TABLE` script
-* Navigate to the project folder in the command line (**`cd mssql-snowflake-migration`**)
+* Open the repository in an IDE of your choice
 * Open the Python file in **`scripts/write_sf_ddl_worksheet.py`** and update the values at the beginning of the script
 * Run the command below to execute the Python script and generate the **`CREATE TABLE`** sql file:
     ```bash
@@ -93,7 +90,7 @@ Follow the steps below from the **`CURO-Astro/`** directory on your local comput
 #### Step 3.1: Export data in CSV format
 > 🚧 This script is still in development and only works for tables with less than 1 million records
 > 
-* Navigate to the project folder in the command line (**`cd mssql-snowflake-migration`**)
+* Open the repository in an IDE of your choice
 * Update the Utils in **`scripts/utils.py`**:
     * Comment out or remove any tables with more than 1 million records from the list of tables in 
     * Check that **`OUTPUT_DIR`** is the path where you want to save the csv files
@@ -109,7 +106,7 @@ Follow the steps below from the **`CURO-Astro/`** directory on your local comput
 
 ### Step 4: Copy CSVs into Snowflake
 #### Step 4.1: Generate `COPY INTO` script
-* Navigate to the project folder in the command line (**`cd mssql-snowflake-migration`**)
+* Open the repository in an IDE of your choice
 * Open the Python file in **`scripts/write_sf_copy_into_worksheet.py`** and update the values at the beginning of the script
 * Run the command below to execute the Python script and generate the **`COPY INTO`** sql file:
     ```bash
