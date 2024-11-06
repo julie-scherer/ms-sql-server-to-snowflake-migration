@@ -128,4 +128,4 @@ Follow the steps below from the **`CURO-Astro/`** directory on your local comput
 
 ## **Issues ❗️**
 
-If you encounter any issues or have questions, please raise an issue in the repository or contact the developer, Julie Scherer, at **[juliescherer@curo.com](mailto:juliescherer@curo.com)**. 📧
+If you encounter any issues or have questions, please raise an issue in the repository or contact the developer, Julie Scherer, at **[julieann.scherer@gmail.com](mailto:julieann.scherer@gmail.com)**. 📧
